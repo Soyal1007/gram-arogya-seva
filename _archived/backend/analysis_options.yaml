@@ -1,0 +1,17 @@
+analyzer:
+  errors:
+    unused_import: warning
+    unused_local_variable: warning
+    dead_code: warning
+  exclude:
+    - '**.freezed.dart'
+    - '**.g.dart'
+
+linter:
+  rules:
+    - avoid_print: false
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_locals
+    - unnecessary_this
+    - prefer_single_quotes

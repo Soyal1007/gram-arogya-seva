@@ -1,0 +1,24 @@
+name: gas_backend
+description: Gram Aarogya Seva — Cloud Run API backend (Dart Shelf)
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  # Firebase Admin SDK for Dart — Firestore access
+  firebase_admin_sdk: ^0.5.1
+  http: ^1.4.0
+  crypto: ^3.0.6
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.4
+  intl: ^0.20.0
+
+dev_dependencies:
+  test: ^1.25.0
+  build_runner: ^2.4.0
+  freezed: ^2.5.0
+  json_serializable: ^6.9.0

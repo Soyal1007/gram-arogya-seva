@@ -1,0 +1,197 @@
+rules_version = '2';
+
+// ════════════════════════════════════════════════════════════════════════
+// Gram Aarogya Seva — Firestore security rules
+//
+// Access model (SRS §8, revised per TECHNICAL_ASSESSMENT.md §A17-1):
+//
+//   Reads   are scoped here, by role and ownership.
+//   Writes  that touch a single document and carry no cross-document
+//           invariant are allowed here, with field-level restrictions.
+//   Writes  that span documents — booking a slot, cancelling and freeing it,
+//           creating a doctor profile while promoting a role — are DENIED to
+//           clients entirely and performed by Cloud Functions, which run on
+//           the Admin SDK and bypass these rules.
+//
+// The guiding principle (DP-4) is that these rules are the authority, not
+// the UI. Where a rule cannot express an invariant, the write does not
+// belong on the client.
+// ════════════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Identity helpers ──────────────────────────────────────────────
+    function isAuth() { return request.auth != null; }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) { return isAuth() && userDoc().role == role; }
+
+    function isAdmin()    { return hasRole('admin'); }
+    function isDoctor()   { return hasRole('doctor'); }
+    function isPatient()  { return hasRole('patient'); }
+    function isOperator() { return hasRole('operator'); }
+
+    function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
+
+    // ── Diff helpers ──────────────────────────────────────────────────
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    /// True when the write touches only the listed fields.
+    function onlyChanges(keys) {
+      return changedKeys().hasOnly(keys);
+    }
+
+    /// True when the write leaves `field` untouched.
+    ///
+    /// This is the correct negation of "may not edit this field".
+    /// `!onlyChanges(['role'])` — the previous formulation — instead allowed
+    /// any write whose key set was not a *subset* of {role}, so bundling
+    /// {role, name} escalated the caller to admin.
+    function doesNotChange(field) {
+      return !(field in changedKeys());
+    }
+
+    // ── VILLAGES ──────────────────────────────────────────────────────
+    // Reference data. Everyone reads (pickers); only admins write.
+    match /villages/{villageId} {
+      allow read: if isAuth();
+      allow create, update: if isAdmin();
+      allow delete: if false;  // DP-5: deactivate, never delete
+    }
+
+    // ── HEALTH CENTRES ────────────────────────────────────────────────
+    match /health_centers/{centerId} {
+      allow read: if isAuth();
+      allow create, update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ── REFERENCE AGGREGATE ───────────────────────────────────────────
+    // `reference/current` mirrors villages + health centres into a single
+    // document so a client can resolve names without streaming both
+    // collections — by far the largest avoidable read cost in the system.
+    // Rebuilt only by Cloud Functions, so it cannot drift from its sources
+    // on a client's say-so.
+    match /reference/{docId} {
+      allow read: if isAuth();
+      allow write: if false;
+    }
+
+    // ── USERS ─────────────────────────────────────────────────────────
+    // The role field is the root of all authorisation in this system, so it
+    // is writable by exactly one party: an admin, and only on its own.
+    // Promotion to `doctor` happens in submitDoctorRegistration (Admin SDK).
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // First OTP login creates the document; the role is forced to patient.
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.role == 'patient';
+
+      allow update: if (isOwner(userId) && doesNotChange('role'))
+        || (isAdmin() && onlyChanges(['role', 'updatedAt']));
+
+      allow delete: if false;
+    }
+
+    // ── DOCTORS ───────────────────────────────────────────────────────
+    // Patients may only discover active doctors; the doctor and admins see
+    // every state. Creation is server-side because it is inseparable from
+    // the role promotion and the Aadhaar hashing.
+    match /doctors/{doctorId} {
+      allow read: if isAuth()
+        && (isAdmin() || isOperator()
+            || isOwner(doctorId)
+            || resource.data.status == 'active');
+
+      allow create: if false;  // submitDoctorRegistration
+
+      allow update: if
+        // Doctor edits their own non-credential fields. NMR/HPR/Aadhaar and
+        // status are deliberately absent from this list (SRS §5.1).
+        (isOwner(doctorId) && onlyChanges([
+          'name', 'specialization', 'mobile', 'villages',
+          'photoBase64', 'updatedAt', 'updatedBy'
+        ]))
+        // Admin approves, rejects, activates or deactivates.
+        || (isAdmin() && onlyChanges([
+          'status', 'approvedBy', 'approvedAt', 'rejectionNote',
+          'updatedAt', 'updatedBy'
+        ]));
+
+      allow delete: if false;
+    }
+
+    // ── PATIENTS ──────────────────────────────────────────────────────
+    // Clinical records. Doctors need read access to look up the patient on
+    // an appointment; operators need it to book on a villager's behalf.
+    match /patients/{patientId} {
+      allow read: if isAdmin() || isOperator() || isDoctor()
+        || (isAuth() && resource.data.userId == request.auth.uid);
+
+      // Operators register walk-ins (userId may be null — SRS §7.5).
+      // Everyone else may only create a profile bound to their own account.
+      allow create: if isOperator()
+        || (isAuth() && request.resource.data.userId == request.auth.uid);
+
+      // userId is the ownership key, so it can never be reassigned — that
+      // would transfer a clinical record to a different person.
+      allow update: if (isAdmin() || isOperator()
+          || (isAuth() && resource.data.userId == request.auth.uid))
+        && request.resource.data.userId == resource.data.userId;
+
+      allow delete: if false;
+    }
+
+    // ── DOCTOR AVAILABILITY ───────────────────────────────────────────
+    // Read by everyone (slot pickers). All writes are server-side:
+    //  - booking flips one slot *and* writes an appointment (one invariant,
+    //    two documents — not expressible here);
+    //  - saving availability must merge already-booked slots forward, which
+    //    a client `set()` cannot be trusted to do.
+    // The previous `allow update: if isPatient()` let any patient rewrite
+    // any doctor's schedule.
+    match /doctor_availability/{availabilityId} {
+      allow read: if isAuth();
+      allow write: if false;  // setDoctorAvailability / bookAppointment
+    }
+
+    // ── APPOINTMENTS ──────────────────────────────────────────────────
+    // Read is scoped to the participants. Every mutation is a state machine
+    // transition with slot side effects, so all of them are server-side.
+    match /appointments/{appointmentId} {
+      allow read: if isAdmin() || isOperator()
+        || (isDoctor() && resource.data.doctorId == request.auth.uid)
+        || (isAuth() && resource.data.patientUserId == request.auth.uid);
+
+      allow write: if false;  // bookAppointment / cancelAppointment /
+                              // updateAppointmentStatus / cancelDoctorDay
+    }
+
+    // ── NOTIFICATIONS ─────────────────────────────────────────────────
+    // Created only by Cloud Functions, so their contents can be trusted as
+    // a record of what the system did. Recipients may only mark them read.
+    match /notifications/{notificationId} {
+      allow read: if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if false;
+      allow update: if isAuth()
+        && resource.data.userId == request.auth.uid
+        && onlyChanges(['isRead']);
+      allow delete: if false;
+    }
+
+    // ── ABDM RATE LIMITS & VERIFICATION STATE ─────────────────────────
+    // Holds the OTP cooldown and the proof that a verification succeeded.
+    // If a client could write here it could forge its own verification.
+    match /abdm_rate_limits/{uid} {
+      allow read, write: if false;
+    }
+  }
+}
