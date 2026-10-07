@@ -3,16 +3,16 @@
     "platforms": {
       "android": {
         "default": {
-          "projectId": "gram-aarogya-dev",
-          "appId": "1:377370846599:android:d6fe70c30af92ef5205f22",
+          "projectId": "gram-aarogya-seva",
+          "appId": "1:907511637949:android:04057b56c5ac43390554d4",
           "fileOutput": "android/app/google-services.json"
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "gram-aarogya-dev",
+          "projectId": "gram-aarogya-seva",
           "configurations": {
-            "android": "1:377370846599:android:d6fe70c30af92ef5205f22"
+            "android": "1:907511637949:android:04057b56c5ac43390554d4"
           }
         }
       }

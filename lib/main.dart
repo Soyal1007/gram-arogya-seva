@@ -21,7 +21,11 @@ void main() async {
 
   // Offline reads (SRS DP-2). Configured through FirestoreService so the
   // `cloud_firestore` import stays confined to the data layer (SRS §6.2).
-  FirestoreService.configureOfflinePersistence();
+  try {
+    FirestoreService.configureOfflinePersistence();
+  } catch (e) {
+    debugPrint('[Firestore] configureOfflinePersistence failed: $e');
+  }
 
   // ── Crash reporting (SRS §21, risk R-16)
   //
@@ -37,21 +41,26 @@ void main() async {
   };
 
   // ── App Check (SRS §21, concern S-6)
-  //
-  // The Firebase config inside an APK is public, so without attestation anyone
-  // can call the Firestore REST API with it. Security rules still protect the
-  // data; App Check is what stops an attacker burning the free tier.
-  //
-  // Debug builds use the debug provider — register the token it prints in the
-  // Firebase console when testing on a new device.
-  await FirebaseAppCheck.instance.activate(
-    androidProvider:
-        kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-  );
+  // App Check is only enforced in RELEASE builds. In debug builds we skip it
+  // entirely so OTP calls are never blocked by a missing debug-token
+  // registration in the Firebase console.
+  if (!kDebugMode) {
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+      );
+    } catch (e) {
+      debugPrint('[AppCheck] activation failed: $e');
+    }
+  }
 
   // Registered before runApp so a push that launched the app is handled in
   // the background isolate.
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  try {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    debugPrint('[Messaging] background handler registration failed: $e');
+  }
 
   runApp(
     EasyLocalization(

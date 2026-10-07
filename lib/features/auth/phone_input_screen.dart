@@ -7,6 +7,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
+import 'package:gram_aarogya_seva/core/models/user_model.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/features/auth/auth_notifier.dart';
 
@@ -40,10 +41,12 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
-    // Navigate to OTP screen when OTP is sent
-    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
-      if (next.status == AuthStatus.otpSent) {
-        context.push(AppConstants.routeOtpVerification);
+    // Navigate to OTP screen when OTP is sent, or handle auto-signin success
+    ref.listen<AuthState>(authNotifierProvider, (prev, next) async {
+      if (next.status == AuthStatus.otpSent && prev?.status != AuthStatus.otpSent) {
+        if (mounted) context.push(AppConstants.routeOtpVerification);
+      } else if (next.status == AuthStatus.success && prev?.status != AuthStatus.success) {
+        await _createUserDocIfNeeded();
       }
     });
 
@@ -179,6 +182,23 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _createUserDocIfNeeded() async {
+    final user = ref.read(authStateProvider).valueOrNull;
+    if (user == null) return;
+
+    final firestoreService = ref.read(firestoreServiceProvider);
+    final existingUser = await firestoreService.getUser(user.uid);
+
+    if (existingUser == null) {
+      await firestoreService.createOrUpdateUser(
+        UserModel.newPatient(
+          uid: user.uid,
+          phone: user.phoneNumber?.replaceAll('+91', '') ?? '',
+        ),
+      );
+    }
   }
 }
 
