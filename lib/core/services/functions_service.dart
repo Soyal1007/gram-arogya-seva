@@ -128,6 +128,19 @@ class FunctionsService {
     await _call('cancelAppointment', {'appointmentId': appointmentId});
   }
 
+  /// Reschedules an existing appointment atomically.
+  Future<void> rescheduleAppointment({
+    required String appointmentId,
+    required String newDate,
+    required String newTimeSlot,
+  }) async {
+    await _call('rescheduleAppointment', {
+      'appointmentId': appointmentId,
+      'newDate': newDate,
+      'newTimeSlot': newTimeSlot,
+    });
+  }
+
   /// Doctor status transitions: accept, reject, complete, no-show.
   Future<void> updateAppointmentStatus({
     required String appointmentId,

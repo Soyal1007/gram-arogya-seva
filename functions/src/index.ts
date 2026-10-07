@@ -28,6 +28,7 @@ export {
 export {
   bookAppointment,
   cancelAppointment,
+  rescheduleAppointment,
   updateAppointmentStatus,
   cancelDoctorDay,
 } from "./appointments";

@@ -18,6 +18,7 @@ import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/language_toggle.dart';
 import 'package:gram_aarogya_seva/shared/widgets/notification_bell.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
+import 'package:gram_aarogya_seva/shared/widgets/reschedule_dialog.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
 
 /// Patient home — SRS §11.3 P-FLOW-01.
@@ -365,23 +366,42 @@ class _PatientAppointmentCardState
               const SizedBox(height: 8),
               if (_isCancelling)
                 const Center(child: CircularProgressIndicator())
-              else if (canCancel)
-                OutlinedButton.icon(
-                  onPressed: _cancelAppointment,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
-                    minimumSize: const Size(0, 48),
-                  ),
-                  icon: const Icon(Icons.cancel_outlined, size: 18),
-                  label: Text(tr('cancel_appointment')),
-                )
               else
-                // Explaining *why* the action is unavailable beats hiding it
-                // (SRS P-FLOW-03 step 2).
-                Text(tr('cancel_too_late'),
-                    style:
-                        AppTextStyles.caption.copyWith(color: AppColors.error)),
+                Row(
+                  children: [
+                    if (canCancel)
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _cancelAppointment,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                            side: const BorderSide(color: AppColors.error),
+                            minimumSize: const Size(0, 48),
+                          ),
+                          icon: const Icon(Icons.cancel_outlined, size: 18),
+                          label: Text(tr('cancel_appointment')),
+                        ),
+                      ),
+                    if (canCancel) const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _rescheduleAppointment,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(0, 48),
+                        ),
+                        icon: const Icon(Icons.edit_calendar, size: 18),
+                        label: Text(tr('reschedule_appointment')),
+                      ),
+                    ),
+                  ],
+                ),
+              if (!canCancel)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(tr('cancel_too_late'),
+                      style:
+                          AppTextStyles.caption.copyWith(color: AppColors.error)),
+                ),
             ],
           ],
         ),
@@ -423,6 +443,16 @@ class _PatientAppointmentCardState
       }
     }
     if (mounted) setState(() => _isCancelling = false);
+  }
+
+  Future<void> _rescheduleAppointment() async {
+    final apt = widget.appointment;
+    final success = await RescheduleDialog.show(context, appointment: apt);
+    if (success == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tr('appointment_rescheduled'))),
+      );
+    }
   }
 }
 

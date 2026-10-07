@@ -277,6 +277,162 @@ export const cancelAppointment = onCall(RUNTIME, async (request) => {
 });
 
 /**
+ * Reschedules an existing appointment atomically.
+ *
+ * Atomically releases the old slot and reserves the new slot within a single
+ * transaction. If the new slot is unavailable or already booked, the old slot
+ * remains untouched and the original appointment stays active.
+ *
+ * SRS §12 / changes.md §12.
+ */
+export const rescheduleAppointment = onCall(RUNTIME, async (request) => {
+  const caller = await requireCaller(request);
+  const data = (request.data ?? {}) as Record<string, unknown>;
+  const appointmentId = requireString(data, "appointmentId", 128);
+  const newDate = requireSchemaDate(data, "newDate");
+  const newTimeSlot = requireString(data, "newTimeSlot", 16);
+
+  const appointmentRef = db.collection(COL.appointments).doc(appointmentId);
+  const snap = await appointmentRef.get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", "Appointment not found");
+  }
+  const appointment = snap.data() ?? {};
+
+  const isOwningPatient =
+    caller.role === ROLE.patient && appointment.patientUserId === caller.uid;
+  const isOwningOperator =
+    caller.role === ROLE.operator &&
+    appointment.createdByOperatorId === caller.uid;
+  const isAdmin = caller.role === ROLE.admin;
+
+  if (!isOwningPatient && !isOwningOperator && !isAdmin) {
+    throw new HttpsError(
+      "permission-denied",
+      "You cannot reschedule this appointment"
+    );
+  }
+
+  const reschedulable: string[] = [
+    APPOINTMENT_STATUS.pending,
+    APPOINTMENT_STATUS.accepted,
+  ];
+  if (!reschedulable.includes(appointment.status)) {
+    throw new HttpsError(
+      "failed-precondition",
+      "This appointment can no longer be rescheduled"
+    );
+  }
+
+  // Booking horizon validation
+  const today = todayInIst();
+  const offset = daysBetween(today, newDate);
+  if (offset < 0) {
+    throw new HttpsError("invalid-argument", "Cannot reschedule to a past date");
+  }
+  if (offset > MAX_BOOKING_DAYS_AHEAD) {
+    throw new HttpsError(
+      "invalid-argument",
+      `Cannot reschedule more than ${MAX_BOOKING_DAYS_AHEAD} days ahead`
+    );
+  }
+
+  const newStartsAt = slotStartAt(newDate, newTimeSlot);
+  if (newStartsAt.getTime() <= Date.now()) {
+    throw new HttpsError("invalid-argument", "That time has already passed");
+  }
+
+  const doctorId = appointment.doctorId as string;
+  const oldDate = appointment.date as string;
+  const oldTimeSlot = appointment.timeSlot as string;
+
+  const oldAvailabilityRef = db
+    .collection(COL.availability)
+    .doc(`${doctorId}_${oldDate}`);
+  const newAvailabilityRef = db
+    .collection(COL.availability)
+    .doc(`${doctorId}_${newDate}`);
+
+  await db.runTransaction(async (tx) => {
+    // 1. Fetch new availability doc & check slot
+    const newAvailSnap = await tx.get(newAvailabilityRef);
+    if (!newAvailSnap.exists) {
+      throw new HttpsError(
+        "failed-precondition",
+        "The doctor has no availability on the new date"
+      );
+    }
+    const newAvailData = newAvailSnap.data() ?? {};
+    const newSlots = (newAvailData.slots ?? []) as SlotRecord[];
+    const newIndex = findSlotIndex(newSlots, newTimeSlot);
+
+    if (newIndex === -1) {
+      throw new HttpsError("failed-precondition", "New slot not found");
+    }
+    if (newSlots[newIndex].isBooked === true) {
+      throw new HttpsError("already-exists", "New slot is already booked");
+    }
+
+    // 2. Fetch old availability doc & check slot
+    const oldAvailSnap =
+      oldDate === newDate ? newAvailSnap : await tx.get(oldAvailabilityRef);
+    const oldSlots = oldDate === newDate ? newSlots : ((oldAvailSnap.data()?.slots ?? []) as SlotRecord[]);
+    const oldIndex = findSlotIndex(oldSlots, oldTimeSlot);
+
+    // 3. Atomically release old slot
+    if (oldIndex !== -1) {
+      oldSlots[oldIndex] = {
+        ...oldSlots[oldIndex],
+        isBooked: false,
+        appointmentId: null,
+      };
+    }
+
+    // 4. Atomically reserve new slot
+    newSlots[newIndex] = {
+      ...newSlots[newIndex],
+      isBooked: true,
+      appointmentId: appointmentId,
+    };
+
+    // 5. Write updates
+    tx.update(appointmentRef, {
+      date: newDate,
+      timeSlot: newTimeSlot,
+      slotStartAt: admin.firestore.Timestamp.fromDate(newStartsAt),
+      updatedAt: serverTimestamp(),
+    });
+
+    if (oldDate === newDate) {
+      tx.update(newAvailabilityRef, {
+        slots: newSlots,
+        updatedAt: serverTimestamp(),
+      });
+    } else {
+      if (oldAvailSnap.exists) {
+        tx.update(oldAvailabilityRef, {
+          slots: oldSlots,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      tx.update(newAvailabilityRef, {
+        slots: newSlots,
+        updatedAt: serverTimestamp(),
+      });
+    }
+  });
+
+  await createNotification({
+    userId: doctorId,
+    type: NOTIF.appointmentBooked,
+    relatedId: appointmentId,
+    arg: `${newDate} ${newTimeSlot}`,
+  });
+
+  return {ok: true};
+});
+
+/**
  * Doctor-driven status transitions: accept, reject, complete, no-show.
  * Rejection frees the slot so it can be rebooked (SRS §D-FLOW-03).
  */
