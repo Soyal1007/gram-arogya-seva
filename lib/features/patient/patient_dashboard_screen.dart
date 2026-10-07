@@ -98,30 +98,27 @@ class PatientDashboardScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () =>
-                          context.push(AppConstants.routeHealthRecords),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(0, 56),
-                      ),
-                      icon: const Icon(Icons.folder_shared_outlined),
-                      label: Text(tr('health_records')),
+                    child: _QuickActionCard(
+                      title: tr('health_records'),
+                      icon: Icons.folder_shared_rounded,
+                      color: const Color(0xFF006039),
+                      bgColor: const Color(0xFFE8F5E9),
+                      onTap: () => context.push(AppConstants.routeHealthRecords),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
+                    child: _QuickActionCard(
+                      title: tr('register_as_doctor'),
+                      icon: Icons.medical_services_rounded,
+                      color: const Color(0xFF1B6D24),
+                      bgColor: const Color(0xFFE8F5E9),
+                      onTap: () {
                         ref
                             .read(isDoctorRegistrationIntentProvider.notifier)
                             .state = true;
                         context.push('/doctor/register');
                       },
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(0, 56),
-                      ),
-                      icon: const Icon(Icons.medical_services_outlined),
-                      label: Text(tr('register_as_doctor')),
                     ),
                   ),
                 ],
@@ -224,35 +221,79 @@ class _ProfileCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // A villageId means nothing to a villager — resolve it to the name.
     final villageName = ref.watch(villageNameProvider(villageId));
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryContainer],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-            child: const Icon(Icons.person, color: AppColors.primary),
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: CircleAvatar(
+              radius: 26,
+              backgroundColor: AppColors.primaryFixed,
+              child: Text(
+                name.isNotEmpty ? name[0].toUpperCase() : 'P',
+                style: AppTextStyles.headlineSmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: AppTextStyles.titleLarge),
-                Text(villageName ?? tr('loading'),
-                    style: AppTextStyles.caption),
+                Text(
+                  name,
+                  style: AppTextStyles.titleLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 16, color: AppColors.primaryFixed),
+                    const SizedBox(width: 4),
+                    Text(
+                      villageName ?? tr('loading'),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primaryFixed,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.edit, color: AppColors.primary),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+            ),
+            icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () => context.push(AppConstants.routePatientProfile),
           ),
         ],
@@ -305,10 +346,17 @@ class _PatientAppointmentCardState
         );
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shadowColor: AppColors.primary.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: AppColors.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -485,6 +533,73 @@ class _InfoBox extends StatelessWidget {
             const SizedBox(width: 6),
             Expanded(child: Text(text, style: AppTextStyles.caption)),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  const _QuickActionCard({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.bgColor,
+    required this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 26),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onSurface,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
