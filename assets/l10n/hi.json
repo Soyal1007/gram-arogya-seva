@@ -228,6 +228,7 @@
   "prescription_label": "दवा पर्चा",
   "next_steps_label": "अगले क़दम",
   "follow_up_date": "अगली मुलाक़ात की तारीख़",
+  "book_followup": "फॉलो-अप बुक करें",
   "complete_confirm": "{} की मुलाक़ात पूर्ण दर्ज करें?",
   "outcome_after_appointment_time": "अपॉइंटमेंट का समय बीतने के बाद आप परिणाम दर्ज कर सकते हैं.",
   "approve_confirm": "{} को स्वीकृति दें?",

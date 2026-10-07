@@ -228,6 +228,7 @@
   "prescription_label": "Prescription",
   "next_steps_label": "Next steps",
   "follow_up_date": "Follow-up date",
+  "book_followup": "Book Follow-up",
   "complete_confirm": "Mark the visit with {} as complete?",
   "outcome_after_appointment_time": "You can record the outcome after the appointment time.",
   "approve_confirm": "Approve {}?",

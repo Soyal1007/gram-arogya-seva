@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gram_aarogya_seva/core/config/app_constants.dart';
 import 'package:gram_aarogya_seva/core/models/appointment_model.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
@@ -101,11 +103,23 @@ class _RecordCard extends ConsumerWidget {
                   value: summary.prescription),
             if (summary.nextSteps.isNotEmpty)
               _Field(label: tr('next_steps_label'), value: summary.nextSteps),
-            if (summary.followUpDate != null)
+            if (summary.followUpDate != null) ...[
               _Field(
                 label: tr('follow_up_date'),
                 value: AppDateUtils.toDisplayDate(summary.followUpDate!),
               ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.go(AppConstants.routePatientBook);
+                  },
+                  icon: const Icon(Icons.calendar_today, size: 18),
+                  label: Text(tr('book_followup')),
+                ),
+              ),
+            ],
           ],
         ),
       ),

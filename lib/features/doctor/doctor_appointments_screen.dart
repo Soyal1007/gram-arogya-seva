@@ -384,49 +384,92 @@ class _DoctorAppointmentCardState
     final notesCtrl = TextEditingController();
     final prescriptionCtrl = TextEditingController();
     final nextStepsCtrl = TextEditingController();
+    DateTime? followUpDate;
 
-    final confirmed = await ConfirmationDialog.show(
-      context,
-      title: tr('completed'),
-      message: tr('complete_confirm', args: [apt.patientName]),
-      confirmLabel: tr('completed'),
-      confirmColor: AppColors.statusCompleted,
-      extraContent: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: notesCtrl,
-            maxLines: 2,
-            decoration: InputDecoration(
-              labelText: tr('notes_label'),
-              border: const OutlineInputBorder(),
-            ),
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => ConfirmationDialog(
+          title: tr('completed'),
+          message: tr('complete_confirm', args: [apt.patientName]),
+          confirmLabel: tr('completed'),
+          confirmColor: AppColors.statusCompleted,
+          extraContent: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: notesCtrl,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  labelText: tr('notes_label'),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: prescriptionCtrl,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  labelText: tr('prescription_label'),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nextStepsCtrl,
+                decoration: InputDecoration(
+                  labelText: tr('next_steps_label'),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: now.add(const Duration(days: 7)),
+                    firstDate: now,
+                    lastDate: now.add(const Duration(days: 90)),
+                  );
+                  if (picked != null) {
+                    setDialogState(() => followUpDate = picked);
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.outlineVariant),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.event, size: 20, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        followUpDate == null
+                            ? '${tr('follow_up_date')} (Optional)'
+                            : AppDateUtils.toDisplayDate(
+                                AppDateUtils.toSchemaDate(followUpDate!)),
+                        style: AppTextStyles.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: prescriptionCtrl,
-            maxLines: 2,
-            decoration: InputDecoration(
-              labelText: tr('prescription_label'),
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: nextStepsCtrl,
-            decoration: InputDecoration(
-              labelText: tr('next_steps_label'),
-              border: const OutlineInputBorder(),
-            ),
-          ),
-        ],
+        ),
       ),
     );
     if (confirmed != true) return;
 
     final hasSummary = notesCtrl.text.trim().isNotEmpty ||
         prescriptionCtrl.text.trim().isNotEmpty ||
-        nextStepsCtrl.text.trim().isNotEmpty;
+        nextStepsCtrl.text.trim().isNotEmpty ||
+        followUpDate != null;
 
     await _transition(
       apt: apt,
@@ -436,6 +479,9 @@ class _DoctorAppointmentCardState
               notes: notesCtrl.text.trim(),
               prescription: prescriptionCtrl.text.trim(),
               nextSteps: nextStepsCtrl.text.trim(),
+              followUpDate: followUpDate != null
+                  ? AppDateUtils.toSchemaDate(followUpDate!)
+                  : null,
             )
           : null,
     );
