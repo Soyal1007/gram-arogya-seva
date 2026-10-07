@@ -272,5 +272,9 @@
   "update_required_message": "A newer version of Gram Aarogya Seva is required. Please update from the Play Store to continue.",
   "load_more": "Load more",
   "change_photo": "Change Photo",
-  "view_photo": "View Photo"
+  "view_photo": "View Photo",
+  "seed_maharashtra_data": "Seed Maharashtra Data",
+  "seed_success": "Seeded Maharashtra dataset successfully!",
+  "seed_skipped": "Data already present.",
+  "location_details": "Location Details"
 }

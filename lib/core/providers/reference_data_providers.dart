@@ -125,3 +125,52 @@ final activeVillagesProvider = Provider<List<VillageModel>>((ref) {
     ..sort((a, b) => a.name.compareTo(b.name));
   return villages;
 });
+
+/// Unique districts available in the system (sorted alphabetically).
+final availableDistrictsProvider = Provider<List<String>>((ref) {
+  final districts = ref
+      .watch(activeVillagesProvider)
+      .map((v) => v.district)
+      .where((d) => d.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+  return districts;
+});
+
+/// Unique talukas available for a specific district.
+final talukasByDistrictProvider = Provider.family<List<String>, String?>((ref, district) {
+  if (district == null || district.isEmpty) return const [];
+  final talukas = ref
+      .watch(activeVillagesProvider)
+      .where((v) => v.district == district)
+      .map((v) => v.taluka)
+      .where((t) => t.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+  return talukas;
+});
+
+/// Villages filtered by district and taluka.
+final villagesByTalukaProvider = Provider.family<List<VillageModel>, ({String? district, String? taluka})>((ref, arg) {
+  if (arg.district == null || arg.taluka == null) return const [];
+  return ref
+      .watch(activeVillagesProvider)
+      .where((v) => v.district == arg.district && v.taluka == arg.taluka)
+      .toList()
+    ..sort((a, b) => a.name.compareTo(b.name));
+});
+
+/// Health centres filtered by village id.
+final healthCentersByVillageProvider = Provider.family<List<HealthCenterModel>, String?>((ref, villageId) {
+  if (villageId == null || villageId.isEmpty) return const [];
+  final centers = ref
+      .watch(healthCentersByIdProvider)
+      .values
+      .where((c) => c.isActive && c.villageId == villageId)
+      .toList()
+    ..sort((a, b) => a.name.compareTo(b.name));
+  return centers;
+});
+

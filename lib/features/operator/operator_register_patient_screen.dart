@@ -9,6 +9,7 @@ import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
+import 'package:gram_aarogya_seva/shared/widgets/location_picker_widget.dart';
 
 /// SRS §11.5 O-FLOW-02: Operator registers walk-in patient.
 /// Checks for duplicate by mobile. No phone auth needed.
@@ -137,25 +138,17 @@ class _OperatorRegisterPatientScreenState
               ),
               const SizedBox(height: 12),
 
-              // Village
-              if (villages.isEmpty)
-                const LinearProgressIndicator()
-              else
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: tr('village_label'),
-                    prefixIcon: const Icon(Icons.location_on),
-                  ),
-                  items: villages
-                      .map((v) => DropdownMenuItem(
-                            value: v.villageId,
-                            child: Text(v.name),
-                          ))
-                      .toList(),
-                  validator: (v) =>
-                      v == null ? tr('select_village_error') : null,
-                  onChanged: (v) => setState(() => _villageId = v),
-                ),
+              // Location Selection (District -> Taluka -> Village)
+              Text(tr('location_details'), style: AppTextStyles.headlineSmall),
+              const SizedBox(height: 12),
+              LocationPickerWidget(
+                initialVillageId: _villageId,
+                showHealthCenter: false,
+                villageValidator: (v) => v == null ? tr('select_village_error') : null,
+                onVillageSelected: (vModel) {
+                  setState(() => _villageId = vModel?.villageId);
+                },
+              ),
               const SizedBox(height: 32),
 
               // Save

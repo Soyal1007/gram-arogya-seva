@@ -11,6 +11,7 @@ import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
+import 'package:gram_aarogya_seva/shared/widgets/location_picker_widget.dart';
 
 /// SRS §11.3 P-FLOW-01: Patient profile create/edit.
 class PatientProfileScreen extends ConsumerStatefulWidget {
@@ -183,28 +184,17 @@ class _PatientProfileScreenState
               ),
               const SizedBox(height: 12),
 
-              // Village
-              if (villages.isEmpty)
-                const LinearProgressIndicator()
-              else
-                DropdownButtonFormField<String>(
-                  initialValue: villages.any((v) => v.villageId == _villageId)
-                      ? _villageId
-                      : null,
-                  decoration: InputDecoration(
-                    labelText: tr('village_label'),
-                    prefixIcon: const Icon(Icons.location_on),
-                  ),
-                  items: villages
-                      .map((v) => DropdownMenuItem(
-                            value: v.villageId,
-                            child: Text(v.name),
-                          ))
-                      .toList(),
-                  validator: (v) =>
-                      v == null ? tr('select_village_error') : null,
-                  onChanged: (v) => setState(() => _villageId = v),
-                ),
+              // Location Selection (District -> Taluka -> Village)
+              Text(tr('location_details'), style: AppTextStyles.headlineSmall),
+              const SizedBox(height: 12),
+              LocationPickerWidget(
+                initialVillageId: _villageId,
+                showHealthCenter: false,
+                villageValidator: (v) => v == null ? tr('select_village_error') : null,
+                onVillageSelected: (vModel) {
+                  setState(() => _villageId = vModel?.villageId);
+                },
+              ),
               const SizedBox(height: 24),
 
               // Emergency Contact

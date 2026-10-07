@@ -9,6 +9,7 @@ import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
+import 'package:gram_aarogya_seva/core/services/seed_service.dart';
 
 /// SRS §11.1 A-FLOW-01 Step 4: Village CRUD.
 class VillageManagementScreen extends ConsumerWidget {
@@ -36,10 +37,35 @@ class VillageManagementScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Text(tr('no_results'), style: AppTextStyles.titleLarge),
                   const SizedBox(height: 24),
-                  LargeButton(
-                    label: tr('add_village'),
-                    icon: Icons.add,
-                    onPressed: () => _showAddVillageDialog(context, ref),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.download),
+                        label: Text(tr('seed_maharashtra_data')),
+                        onPressed: () async {
+                          final fs = ref.read(firestoreServiceProvider);
+                          final seeded = await SeedService(fs).seedMaharashtraLocationsIfEmpty();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  seeded
+                                      ? tr('seed_success')
+                                      : tr('seed_skipped'),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      LargeButton(
+                        label: tr('add_village'),
+                        icon: Icons.add,
+                        onPressed: () => _showAddVillageDialog(context, ref),
+                      ),
+                    ],
                   ),
                 ],
               ),
