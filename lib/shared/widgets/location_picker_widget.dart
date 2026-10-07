@@ -69,7 +69,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
       children: [
         // District Selector
         DropdownButtonFormField<String>(
-          value: districts.contains(_selectedDistrict) ? _selectedDistrict : null,
+          initialValue: districts.contains(_selectedDistrict) ? _selectedDistrict : null,
           decoration: InputDecoration(
             labelText: tr('district_label'),
             prefixIcon: const Icon(Icons.map_rounded),
@@ -95,7 +95,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
 
         // Taluka Selector
         DropdownButtonFormField<String>(
-          value: talukas.contains(_selectedTaluka) ? _selectedTaluka : null,
+          initialValue: talukas.contains(_selectedTaluka) ? _selectedTaluka : null,
           decoration: InputDecoration(
             labelText: tr('taluka_label'),
             prefixIcon: const Icon(Icons.location_city_rounded),
@@ -122,7 +122,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
 
         // Village Selector
         DropdownButtonFormField<String>(
-          value: villages.any((v) => v.villageId == _selectedVillageId)
+          initialValue: villages.any((v) => v.villageId == _selectedVillageId)
               ? _selectedVillageId
               : null,
           decoration: InputDecoration(
@@ -153,7 +153,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
         if (widget.showHealthCenter) ...[
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: healthCenters.any((c) => c.centerId == _selectedHealthCenterId)
+            initialValue: healthCenters.any((c) => c.centerId == _selectedHealthCenterId)
                 ? _selectedHealthCenterId
                 : null,
             decoration: InputDecoration(

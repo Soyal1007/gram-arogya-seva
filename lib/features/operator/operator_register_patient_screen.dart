@@ -8,7 +8,6 @@ import 'package:gram_aarogya_seva/core/models/patient_model.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
-import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
 import 'package:gram_aarogya_seva/shared/widgets/location_picker_widget.dart';
 
 /// SRS §11.5 O-FLOW-02: Operator registers walk-in patient.
@@ -45,8 +44,6 @@ class _OperatorRegisterPatientScreenState
     // Reference aggregate rather than the whole villages collection — the
     // operator screen shared the patient profile screen's defect
     // (PATIENT_MODULE.md P-11).
-    final villages = ref.watch(activeVillagesProvider);
-
     return Scaffold(
       appBar: AppBar(title: Text(tr('register_patient'))),
       body: SingleChildScrollView(

@@ -10,7 +10,6 @@ import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
-import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
 import 'package:gram_aarogya_seva/shared/widgets/location_picker_widget.dart';
 
 /// SRS §11.3 P-FLOW-01: Patient profile create/edit.
@@ -90,8 +89,6 @@ class _PatientProfileScreenState
     // Reads the `reference/current` aggregate rather than streaming the whole
     // villages collection — the same read-cost fix already applied elsewhere
     // (PATIENT_MODULE.md P-11).
-    final villages = ref.watch(activeVillagesProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEdit ? tr('edit_profile') : tr('create_profile')),
