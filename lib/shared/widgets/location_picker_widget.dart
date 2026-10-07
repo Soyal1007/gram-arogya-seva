@@ -139,7 +139,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
           onChanged: _selectedTaluka == null
               ? null
               : (val) {
-                  final vModel = villages.firstWhere((v) => v.villageId == val);
+                  final vModel = val != null ? villages.cast<VillageModel?>().firstWhere((v) => v?.villageId == val, orElse: () => null) : null;
                   setState(() {
                     _selectedVillageId = val;
                     _selectedHealthCenterId = null;
@@ -169,7 +169,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
             onChanged: _selectedVillageId == null
                 ? null
                 : (val) {
-                    final cModel = healthCenters.firstWhere((c) => c.centerId == val);
+                    final cModel = val != null ? healthCenters.cast<HealthCenterModel?>().firstWhere((c) => c?.centerId == val, orElse: () => null) : null;
                     setState(() {
                       _selectedHealthCenterId = val;
                     });
