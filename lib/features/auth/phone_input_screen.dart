@@ -57,96 +57,142 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 48),
+              const SizedBox(height: 20),
 
-              // App icon
+              // Hero Header Card with Healing Gradient
               Container(
-                width: 96,
-                height: 96,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.primaryContainer],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.local_hospital_rounded,
-                  size: 56,
-                  color: AppColors.primary,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.health_and_safety_rounded,
+                        size: 48,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      tr('app_name'),
+                      style: AppTextStyles.headlineLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // App title
-              Text(
-                tr('app_name'),
-                style: AppTextStyles.headlineLarge.copyWith(
-                  color: AppColors.primary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
 
               // Language selector
               _LanguageSelector(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Phone number form
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(tr('enter_mobile'), style: AppTextStyles.titleLarge),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 10,
-                      style: AppTextStyles.bodyLarge,
-                      decoration: InputDecoration(
-                        prefixText: '+91  ',
-                        prefixStyle: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        hintText: '9876543210',
-                        counterText: '',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+              // Phone number form inside elevated white card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tr('enter_mobile'),
+                        style: AppTextStyles.titleLarge.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      validator: Validators.validatePhone,
-                    ),
-                    const SizedBox(height: 24),
-                    LargeButton(
-                      label: tr('continue_btn'),
-                      icon: Icons.send_rounded,
-                      isLoading: authState.status == AuthStatus.sendingOtp,
-                      onPressed: authState.status == AuthStatus.sendingOtp
-                          ? null
-                          : _onSendOtp,
-                    ),
-                    const SizedBox(height: 16),
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () {
-                          ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(tr('doctor_registration_mode')),
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.medical_services_outlined, size: 20),
-                        label: Text(
-                          tr('register_as_doctor'),
-                          style: AppTextStyles.bodyMedium.copyWith(
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 10,
+                        style: AppTextStyles.headlineSmall.copyWith(
+                          color: AppColors.onSurface,
+                        ),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.phone_android_rounded, color: AppColors.primary),
+                          prefixText: '+91  ',
+                          prefixStyle: AppTextStyles.titleLarge.copyWith(
+                            fontWeight: FontWeight.bold,
                             color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                          ),
+                          hintText: '9876543210',
+                          counterText: '',
+                        ),
+                        validator: Validators.validatePhone,
+                      ),
+                      const SizedBox(height: 24),
+                      LargeButton(
+                        label: tr('continue_btn'),
+                        icon: Icons.arrow_forward_rounded,
+                        isLoading: authState.status == AuthStatus.sendingOtp,
+                        onPressed: authState.status == AuthStatus.sendingOtp
+                            ? null
+                            : _onSendOtp,
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: TextButton.icon(
+                          onPressed: () {
+                            ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(tr('doctor_registration_mode')),
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.medical_services_rounded, color: AppColors.primary, size: 22),
+                          label: Text(
+                            tr('register_as_doctor'),
+                            style: AppTextStyles.titleMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
