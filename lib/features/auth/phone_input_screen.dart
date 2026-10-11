@@ -7,6 +7,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
+import 'package:gram_aarogya_seva/shared/widgets/guided_tour_dialog.dart';
 import 'package:gram_aarogya_seva/core/models/user_model.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/features/auth/auth_notifier.dart';
@@ -87,7 +88,21 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
 
               // Language selector
               _LanguageSelector(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => GuidedTourDialog.show(context),
+                icon: const Icon(Icons.lightbulb_outline_rounded, size: 20),
+                label: Text(
+                  tr('guided_tour_title'),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+              ),
+              const SizedBox(height: 24),
 
               // Phone number form
               Form(
