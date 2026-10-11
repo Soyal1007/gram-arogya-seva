@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:gram_aarogya_seva/core/services/tts_service.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 
 /// Interactive Multi-lingual Guided Tour for rural patients.
-/// Supports Marathi, Hindi, and English with instant on-the-fly switching,
-/// high-contrast visual steps, audio simulation cues, and 56dp+ touch targets.
+/// Supports Marathi, Hindi, and English with real TTS voice playback,
+/// high-contrast visual steps, audio cues, and zero pixel overflow.
 class GuidedTourDialog extends StatefulWidget {
-  const GuidedTourDialog({super.key});
+  final VoidCallback? onStartSpotlightTour;
 
-  static Future<void> show(BuildContext context) {
+  const GuidedTourDialog({super.key, this.onStartSpotlightTour});
+
+  static Future<void> show(BuildContext context, {VoidCallback? onStartSpotlightTour}) {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (context) => const GuidedTourDialog(),
+      builder: (context) => GuidedTourDialog(onStartSpotlightTour: onStartSpotlightTour),
     );
   }
 
@@ -24,13 +27,51 @@ class GuidedTourDialog extends StatefulWidget {
 class _GuidedTourDialogState extends State<GuidedTourDialog> {
   int _currentStep = 0;
   final int _totalSteps = 4;
+  final TtsService _ttsService = TtsService();
   bool _isPlayingAudio = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _ttsService.isSpeakingNotifier.addListener(_onTtsStateChanged);
+  }
+
+  @override
+  void dispose() {
+    _ttsService.stop();
+    _ttsService.isSpeakingNotifier.removeListener(_onTtsStateChanged);
+    _ttsService.dispose();
+    super.dispose();
+  }
+
+  void _onTtsStateChanged() {
+    if (mounted) {
+      setState(() {
+        _isPlayingAudio = _ttsService.isSpeakingNotifier.value;
+      });
+    }
+  }
+
+  void _speakCurrentStepAudio(String textHindi, String textMarathi, String textEnglish) {
+    final lang = context.locale.languageCode;
+    final text = lang == 'mr'
+        ? textMarathi
+        : lang == 'hi'
+            ? textHindi
+            : textEnglish;
+
+    if (_isPlayingAudio) {
+      _ttsService.stop();
+    } else {
+      _ttsService.speak(text, languageCode: lang);
+    }
+  }
+
   void _next() {
+    _ttsService.stop();
     if (_currentStep < _totalSteps - 1) {
       setState(() {
         _currentStep++;
-        _isPlayingAudio = false;
       });
     } else {
       Navigator.of(context).pop();
@@ -38,18 +79,12 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
   }
 
   void _previous() {
+    _ttsService.stop();
     if (_currentStep > 0) {
       setState(() {
         _currentStep--;
-        _isPlayingAudio = false;
       });
     }
-  }
-
-  void _toggleAudio() {
-    setState(() {
-      _isPlayingAudio = !_isPlayingAudio;
-    });
   }
 
   @override
@@ -58,7 +93,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
@@ -75,13 +110,13 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top Bar: Step Indicator & Language Switcher
+            // Top Bar: Step Indicator & Language Switcher (Zero Overflow)
             _buildTopBar(context, currentLocale),
 
             // Step Content
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: _buildCurrentStepContent(context),
               ),
             ),
@@ -96,7 +131,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
   Widget _buildTopBar(BuildContext context, String currentLocale) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 14, 12, 10),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -106,27 +141,40 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   tr('guided_tour_step', args: ['${_currentStep + 1}', '$_totalSteps']),
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
               ),
-              const Spacer(),
-              // Language Switcher Chips
-              _buildLanguageSelector(context),
               const SizedBox(width: 8),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: _buildLanguageSelector(context),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
               IconButton(
-                icon: const Icon(Icons.close_rounded, size: 24),
+                icon: const Icon(Icons.close_rounded, size: 22),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 tooltip: tr('close'),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  _ttsService.stop();
+                  Navigator.of(context).pop();
+                },
               ),
             ],
           ),
@@ -162,7 +210,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(2),
       child: Row(
@@ -181,17 +229,18 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
     return GestureDetector(
       onTap: () {
         context.setLocale(Locale(code));
+        _ttsService.stop();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
           ),
@@ -217,12 +266,16 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
   /// Step 0: Language & Overview
   Widget _buildStep1Language() {
+    const hindiAudio = 'नमस्ते! आप इस ऐप में हिंदी, मराठी या अंग्रेजी कभी भी बदल सकते हैं।';
+    const marathiAudio = 'नमस्कार! आपण या ॲपमध्ये मराठी, हिंदी किंवा इंग्रजी कधीही निवडू शकता.';
+    const englishAudio = 'Welcome! You can change between Marathi, Hindi and English anytime.';
+
     return Column(
       children: [
         const SizedBox(height: 12),
         Container(
-          width: 80,
-          height: 80,
+          width: 76,
+          height: 76,
           decoration: BoxDecoration(
             color: const Color(0xFFE8F5E9),
             shape: BoxShape.circle,
@@ -230,11 +283,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           child: const Icon(
             Icons.translate_rounded,
-            size: 44,
+            size: 40,
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           tr('tour_lang_title'),
           style: AppTextStyles.headlineSmall.copyWith(
@@ -243,32 +296,32 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(
           tr('tour_lang_desc'),
           style: AppTextStyles.bodyLarge.copyWith(
             color: AppColors.onSurfaceVariant,
-            height: 1.4,
+            height: 1.35,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 20),
-        _buildAudioHint(
-          audioTextHindi: 'नमस्ते! आप इस ऐप में हिंदी, मराठी या अंग्रेजी कभी भी बदल सकते हैं।',
-          audioTextMarathi: 'नमस्कार! आपण या ॲपमध्ये मराठी, हिंदी किंवा इंग्रजी कधीही निवडू शकता.',
-          audioTextEnglish: 'Welcome! You can change between Marathi, Hindi and English anytime.',
-        ),
         const SizedBox(height: 16),
+        _buildAudioHint(
+          audioTextHindi: hindiAudio,
+          audioTextMarathi: marathiAudio,
+          audioTextEnglish: englishAudio,
+        ),
+        const SizedBox(height: 14),
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
-              const Icon(Icons.touch_app_rounded, color: AppColors.primary, size: 28),
-              const SizedBox(width: 12),
+              const Icon(Icons.touch_app_rounded, color: AppColors.primary, size: 26),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   context.locale.languageCode == 'mr'
@@ -288,12 +341,16 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
   /// Step 1: Booking an Appointment
   Widget _buildStep2Booking() {
+    const hindiAudio = 'अपॉइंटमेंट बुक करने के बाद आपको अस्पताल में लाइन में नहीं लगना पड़ेगा।';
+    const marathiAudio = 'अपॉइंटमेंट बुक केल्यावर तुम्हाला दवाखान्यात ताटकळत बसावे लागणार नाही.';
+    const englishAudio = 'Booking beforehand saves your time and avoids long hospital queues.';
+
     return Column(
       children: [
         const SizedBox(height: 12),
         Container(
-          width: 80,
-          height: 80,
+          width: 76,
+          height: 76,
           decoration: BoxDecoration(
             color: const Color(0xFFE0F2F1),
             shape: BoxShape.circle,
@@ -301,11 +358,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           child: const Icon(
             Icons.calendar_month_rounded,
-            size: 44,
+            size: 40,
             color: Color(0xFF00897B),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           tr('tour_book_title'),
           style: AppTextStyles.headlineSmall.copyWith(
@@ -314,7 +371,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildVisualChecklist([
           (
             number: '१',
@@ -359,11 +416,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             icon: Icons.check_circle_outline,
           ),
         ]),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildAudioHint(
-          audioTextHindi: 'अपॉइंटमेंट बुक करने के बाद आपको अस्पताल में लाइन में नहीं लगना पड़ेगा।',
-          audioTextMarathi: 'अपॉइंटमेंट बुक केल्यावर तुम्हाला दवाखान्यात ताटकळत बसावे लागणार नाही.',
-          audioTextEnglish: 'Booking beforehand saves your time and avoids long hospital queues.',
+          audioTextHindi: hindiAudio,
+          audioTextMarathi: marathiAudio,
+          audioTextEnglish: englishAudio,
         ),
       ],
     );
@@ -371,12 +428,16 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
   /// Step 2: Health Records & Prescriptions
   Widget _buildStep3Records() {
+    const hindiAudio = 'कागज़ की पर्ची खो जाने की कोई चिंता नहीं, सब कुछ ऐप में सुरक्षित है।';
+    const marathiAudio = 'कागदाची चिठ्ठी गहाळ होण्याची भीती नाही, सर्व माहिती ॲपमध्ये सुरक्षित राहते.';
+    const englishAudio = 'No fear of losing paper slips, your prescription is safely stored in app.';
+
     return Column(
       children: [
         const SizedBox(height: 12),
         Container(
-          width: 80,
-          height: 80,
+          width: 76,
+          height: 76,
           decoration: BoxDecoration(
             color: const Color(0xFFE1F5FE),
             shape: BoxShape.circle,
@@ -384,11 +445,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           child: const Icon(
             Icons.receipt_long_rounded,
-            size: 44,
+            size: 40,
             color: Color(0xFF0288D1),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           tr('tour_records_title'),
           style: AppTextStyles.headlineSmall.copyWith(
@@ -397,18 +458,18 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(
           tr('tour_records_desc'),
           style: AppTextStyles.bodyLarge.copyWith(
             color: AppColors.onSurfaceVariant,
-            height: 1.4,
+            height: 1.35,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF1F8E9),
             borderRadius: BorderRadius.circular(16),
@@ -418,8 +479,8 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.check_box_rounded, color: AppColors.primary, size: 24),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.check_box_rounded, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       context.locale.languageCode == 'mr'
@@ -432,11 +493,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.check_box_rounded, color: AppColors.primary, size: 24),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.check_box_rounded, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       context.locale.languageCode == 'mr'
@@ -452,11 +513,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildAudioHint(
-          audioTextHindi: 'कागज़ की पर्ची खो जाने की कोई चिंता नहीं, सब कुछ ऐप में सुरक्षित है।',
-          audioTextMarathi: 'कागदाची चिठ्ठी गहाळ होण्याची भीती नाही, सर्व माहिती ॲपमध्ये सुरक्षित राहते.',
-          audioTextEnglish: 'No fear of losing paper slips, your prescription is safely stored in app.',
+          audioTextHindi: hindiAudio,
+          audioTextMarathi: marathiAudio,
+          audioTextEnglish: englishAudio,
         ),
       ],
     );
@@ -464,12 +525,16 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
 
   /// Step 3: Village ASHA & Emergency Help
   Widget _buildStep4EmergencyAndAsha() {
+    const hindiAudio = 'अगर आपको फोन चलाने में दिक्कत हो तो अपने गाँव की आशा दीदी से सहायता लें।';
+    const marathiAudio = 'फॉर्म भरण्यास अडचण असल्यास आपल्या गावातील आशा सेविकेची मदत घ्या.';
+    const englishAudio = 'If you face any difficulty, ask your village ASHA worker for help.';
+
     return Column(
       children: [
         const SizedBox(height: 12),
         Container(
-          width: 80,
-          height: 80,
+          width: 76,
+          height: 76,
           decoration: BoxDecoration(
             color: const Color(0xFFFFEBEE),
             shape: BoxShape.circle,
@@ -477,11 +542,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           child: const Icon(
             Icons.support_agent_rounded,
-            size: 44,
+            size: 40,
             color: Color(0xFFD32F2F),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           tr('tour_help_title'),
           style: AppTextStyles.headlineSmall.copyWith(
@@ -490,18 +555,18 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(
           tr('tour_help_desc'),
           style: AppTextStyles.bodyLarge.copyWith(
             color: AppColors.onSurfaceVariant,
-            height: 1.4,
+            height: 1.35,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
@@ -514,14 +579,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                 title: tr('emergency_ambulance'),
                 desc: '108 (२४ तास विनामूल्य / 24 Hours Free)',
               ),
-              const Divider(height: 16),
+              const Divider(height: 14),
               _buildHelpRow(
                 icon: Icons.phone_in_talk_rounded,
                 iconColor: const Color(0xFF1976D2),
                 title: tr('emergency_health_call'),
                 desc: '104 (आरोग्य सल्ला व मार्गदर्शन)',
               ),
-              const Divider(height: 16),
+              const Divider(height: 14),
               _buildHelpRow(
                 icon: Icons.volunteer_activism_rounded,
                 iconColor: AppColors.primary,
@@ -531,11 +596,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildAudioHint(
-          audioTextHindi: 'अगर आपको फोन चलाने में दिक्कत हो तो अपने गाँव की आशा दीदी से सहायता लें।',
-          audioTextMarathi: 'फॉर्म भरण्यास अडचण असल्यास आपल्या गावातील आशा सेविकेची मदत घ्या.',
-          audioTextEnglish: 'If you face any difficulty, ask your village ASHA worker for help.',
+          audioTextHindi: hindiAudio,
+          audioTextMarathi: marathiAudio,
+          audioTextEnglish: englishAudio,
         ),
       ],
     );
@@ -555,9 +620,9 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             color: iconColor.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: iconColor, size: 22),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,10 +630,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
               Text(
                 title,
                 style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
                 desc,
                 style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -582,8 +651,8 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
     return Column(
       children: items.map((item) {
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(14),
@@ -591,8 +660,8 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           child: Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
@@ -603,11 +672,11 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 13,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -615,15 +684,19 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                     Text(
                       item.title,
                       style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       item.subtitle,
                       style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Icon(item.icon, color: AppColors.primary, size: 22),
+              Icon(item.icon, color: AppColors.primary, size: 20),
             ],
           ),
         );
@@ -644,10 +717,10 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             : audioTextEnglish;
 
     return InkWell(
-      onTap: _toggleAudio,
+      onTap: () => _speakCurrentStepAudio(audioTextHindi, audioTextMarathi, audioTextEnglish),
       borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: _isPlayingAudio
               ? AppColors.primary.withValues(alpha: 0.12)
@@ -664,9 +737,9 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             Icon(
               _isPlayingAudio ? Icons.volume_up_rounded : Icons.volume_down_rounded,
               color: AppColors.primary,
-              size: 24,
+              size: 22,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 _isPlayingAudio ? text : '🔊 ${tr("tour_listen")}: "$text"',
@@ -674,6 +747,24 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                   color: AppColors.onSurface,
                   fontStyle: FontStyle.italic,
                   fontWeight: _isPlayingAudio ? FontWeight.bold : FontWeight.normal,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: _isPlayingAudio ? AppColors.primary : Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _isPlayingAudio ? 'थांबवा / Stop' : 'ऐका / Play',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: _isPlayingAudio ? Colors.white : AppColors.primary,
                 ),
               ),
             ),
@@ -687,63 +778,88 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
     final isLastStep = _currentStep == _totalSteps - 1;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (_currentStep > 0)
-            Expanded(
-              flex: 1,
-              child: SizedBox(
-                height: 52,
-                child: OutlinedButton(
-                  onPressed: _previous,
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    side: const BorderSide(color: AppColors.outlineVariant),
+          Row(
+            children: [
+              if (_currentStep > 0)
+                Expanded(
+                  flex: 1,
+                  child: SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: _previous,
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        side: const BorderSide(color: AppColors.outlineVariant),
+                      ),
+                      child: Text(
+                        tr('previous'),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Text(
-                    tr('previous'),
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                      fontWeight: FontWeight.bold,
+                )
+              else
+                const SizedBox.shrink(),
+              if (_currentStep > 0) const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: _next,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.onPrimary,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    icon: Icon(
+                      isLastStep ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
+                      size: 18,
+                    ),
+                    label: Text(
+                      isLastStep ? tr('tour_got_it') : tr('next_step'),
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.onPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
               ),
-            )
-          else
-            const SizedBox.shrink(),
-          if (_currentStep > 0) const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: SizedBox(
-              height: 52,
-              child: ElevatedButton.icon(
-                onPressed: _next,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                icon: Icon(
-                  isLastStep ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
-                  size: 20,
-                ),
-                label: Text(
-                  isLastStep ? tr('tour_got_it') : tr('next_step'),
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            ],
+          ),
+          if (widget.onStartSpotlightTour != null) ...[
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () {
+                _ttsService.stop();
+                Navigator.of(context).pop();
+                widget.onStartSpotlightTour?.call();
+              },
+              icon: const Icon(Icons.fullscreen_rounded, size: 20, color: AppColors.primary),
+              label: Text(
+                context.locale.languageCode == 'mr'
+                    ? 'स्क्रीनवर फिचर हायलाइट करा (Interactive Tour)'
+                    : context.locale.languageCode == 'hi'
+                        ? 'स्क्रीन पर फीचर देखें (Interactive Tour)'
+                        : 'Spotlight Features on Screen',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
