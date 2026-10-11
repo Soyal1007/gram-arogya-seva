@@ -77,10 +77,14 @@ class NotificationService {
 
   /// Stream of routes to navigate to, from pushes tapped by the user.
   Stream<String> get onNotificationTap async* {
-    // App opened from a terminated state by tapping a push.
-    final initial = await _messaging.getInitialMessage();
-    final initialRoute = routeForType(initial?.data['type'] as String?);
-    if (initialRoute != null) yield initialRoute;
+    try {
+      // App opened from a terminated state by tapping a push.
+      final initial = await _messaging.getInitialMessage();
+      final initialRoute = routeForType(initial?.data['type'] as String?);
+      if (initialRoute != null) yield initialRoute;
+    } catch (e) {
+      debugPrint('[FCM] getInitialMessage failed: $e');
+    }
 
     // App resumed from background by tapping a push.
     yield* FirebaseMessaging.onMessageOpenedApp

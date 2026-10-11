@@ -68,14 +68,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Debug logging
       debugPrint('[ROUTER] path=${state.matchedLocation} '
           'loggedIn=$isLoggedIn authLoading=$isAuthLoading '
-          'userRole=${userState.valueOrNull?.role}');
+          'userState=${userState.isLoading ? "loading" : userState.valueOrNull?.role ?? "null"}');
 
       // Auth still loading — stay on splash
-      if (isAuthLoading && isOnSplash) return null;
+      if (isAuthLoading) return isOnSplash ? null : AppConstants.routeSplash;
 
-      // Routes any authenticated user may open regardless of role. Without
-      // this, the role check below compares the path's first segment against
-      // the user's dashboard and bounces them away from shared screens.
+      // Routes any authenticated user may open regardless of role.
       const sharedRoutes = <String>{
         '/doctor/register',
         AppConstants.routeNotifications,
@@ -89,16 +87,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         return isOnLogin ? null : AppConstants.routePhoneInput;
       }
 
-      // Logged in — get user doc
+      // Logged in. Now wait for the Firestore user document.
+      // KEY FIX: return null (stay put) while loading — never redirect in
+      // circles. The _GoRouterRefreshStream will fire again once the doc loads.
+      if (userState.isLoading) return null;
+
       final user = userState.valueOrNull;
 
       // On login/splash — redirect by role
       if (isOnLogin || isOnSplash) {
         if (user == null) {
-          if (userState.isLoading) {
-            return isOnSplash ? null : AppConstants.routeSplash;
-          }
-          return AppConstants.routePhoneInput;
+          // Doc loaded but returns nothing — first login, user doc hasn't been
+          // created yet. Stay on OTP/login so the doc creation can complete.
+          return isOnSplash ? AppConstants.routePhoneInput : null;
         }
         return _roleBasedRoute(ref, user, isOnSplash: isOnSplash);
       }
@@ -109,7 +110,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (correctRoute != null) {
           final currentBase = '/${state.matchedLocation.split('/')[1]}';
           final correctBase = '/${correctRoute.split('/')[1]}';
-          // If user role changed (e.g. patient→admin), redirect
           if (currentBase != correctBase) {
             debugPrint('[ROUTER] Role mismatch! '
                 'current=$currentBase correct=$correctBase → redirecting');

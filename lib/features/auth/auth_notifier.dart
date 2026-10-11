@@ -59,39 +59,51 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     final formattedPhone = '+91$phoneNumber'; // Indian numbers only
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: formattedPhone,
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        // Auto-sign in (happens on some Android devices)
-        await _signInWithCredential(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        // SRS §12.1: never surface a raw Firebase code to the user. The code
-        // goes to the log for diagnosis; the user gets a localisation key.
-        debugPrint('[Auth] verifyPhoneNumber failed: ${e.code} ${e.message}');
-        state = state.copyWith(
-          status: AuthStatus.error,
-          errorKey: switch (e.code) {
-            'too-many-requests' => 'error_rate_limited',
-            'invalid-phone-number' => 'error_invalid_phone',
-            'network-request-failed' => 'error_no_network',
-            _ => 'error_otp_send_failed',
-          },
-        );
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        state = state.copyWith(
-          status: AuthStatus.otpSent,
-          verificationId: verificationId,
-          resendToken: resendToken,
-        );
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // No action needed — user can still manually enter OTP
-      },
-      forceResendingToken: state.resendToken,
-    );
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: formattedPhone,
+        timeout: const Duration(seconds: 30),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          debugPrint('[Auth] verifyPhoneNumber completed automatically');
+          await _signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          debugPrint('[Auth] verifyPhoneNumber failed: code=${e.code} message=${e.message}');
+          state = state.copyWith(
+            status: AuthStatus.error,
+            errorKey: switch (e.code) {
+              'too-many-requests' => 'error_rate_limited',
+              'invalid-phone-number' => 'error_invalid_phone',
+              'network-request-failed' => 'error_no_network',
+              'quota-exceeded' => 'error_otp_send_failed',
+              _ => 'error_otp_send_failed',
+            },
+          );
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          debugPrint('[Auth] codeSent: $verificationId');
+          state = state.copyWith(
+            status: AuthStatus.otpSent,
+            verificationId: verificationId,
+            resendToken: resendToken,
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          debugPrint('[Auth] codeAutoRetrievalTimeout: $verificationId');
+          state = state.copyWith(
+            status: state.status == AuthStatus.sendingOtp ? AuthStatus.otpSent : state.status,
+            verificationId: verificationId,
+          );
+        },
+        forceResendingToken: state.resendToken,
+      );
+    } catch (e) {
+      debugPrint('[Auth] sendOtp uncaught error: $e');
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorKey: 'error_otp_send_failed',
+      );
+    }
   }
 
   /// Verifies the OTP entered by the user.

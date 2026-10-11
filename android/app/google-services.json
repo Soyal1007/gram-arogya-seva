@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "377370846599",
-    "project_id": "gram-aarogya-dev",
-    "storage_bucket": "gram-aarogya-dev.firebasestorage.app"
+    "project_number": "907511637949",
+    "project_id": "gram-aarogya-seva",
+    "storage_bucket": "gram-aarogya-seva.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:377370846599:android:d6fe70c30af92ef5205f22",
+        "mobilesdk_app_id": "1:907511637949:android:04057b56c5ac43390554d4",
         "android_client_info": {
           "package_name": "com.uba.gram_aarogya_seva"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCkoLL9F9oPYVAI8ylQQdLum624cBnqHnw"
+          "current_key": "AIzaSyAmNGb-FNPCqHjgZQYJLHe6-v7n0g8fsl4"
         }
       ],
       "services": {
