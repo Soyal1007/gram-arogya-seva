@@ -3,7 +3,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 
 /// Navigation tile for the doctor / operator / admin home screens: icon in a
-/// tinted square, label at full body size, optional count of items that need
+/// tinted circle, label at full body size, optional count of items that need
 /// attention (pending requests, approvals).
 class DashboardTile extends StatelessWidget {
   const DashboardTile({
@@ -54,9 +54,10 @@ class DashboardTile extends StatelessWidget {
                   Container(
                     width: 48,
                     height: 48,
+                    // Warli geometry: the circle (sun, head) holds the icon.
                     decoration: BoxDecoration(
                       color: tint,
-                      borderRadius: BorderRadius.circular(14),
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: accent, size: 26),
                   ),
@@ -74,7 +75,7 @@ class DashboardTile extends StatelessWidget {
                         '$badge',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.primaryDeep,
+                          color: AppColors.geruDeep,
                         ),
                       ),
                     ),
@@ -123,7 +124,7 @@ class DashboardTileGrid extends StatelessWidget {
   }
 }
 
-/// Today-at-a-glance counters on a peacock header, divided by hairline gold.
+/// Today-at-a-glance counters on the mural header, divided by rice-white rules.
 class HeaderStats extends StatelessWidget {
   const HeaderStats({super.key, required this.stats});
 
@@ -139,7 +140,7 @@ class HeaderStats extends StatelessWidget {
           width: 1,
           height: 40,
           margin: const EdgeInsets.symmetric(horizontal: 12),
-          color: AppColors.zariBright.withValues(alpha: 0.45),
+          color: AppColors.onMural.withValues(alpha: 0.4),
         ));
       }
       final (label, value) = stats[i];
@@ -150,7 +151,7 @@ class HeaderStats extends StatelessWidget {
             Text(
               value,
               style: AppTextStyles.displayMedium.copyWith(
-                color: AppColors.onPrimary,
+                color: AppColors.onMural,
                 height: 1.1,
               ),
             ),
@@ -159,7 +160,7 @@ class HeaderStats extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.onPrimaryContainer,
+                color: AppColors.onMuralMuted,
               ),
             ),
           ],

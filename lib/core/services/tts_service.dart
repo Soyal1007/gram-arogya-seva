@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -139,6 +141,14 @@ class TtsService {
     final targetLang = languageCode?.toLowerCase() ?? 'en';
     final targetLocale = _mapLanguageCode(targetLang);
 
+    // 0. Pre-recorded clip bundled with the app (Marathi / Hindi tour
+    // narration, see tool/generate_tour_audio.py). Plays offline and does
+    // not depend on the phone having a Marathi or Hindi voice installed.
+    if (targetLang == 'mr' || targetLang == 'hi') {
+      final played = await _playBundledClip(trimmed, targetLang);
+      if (played) return;
+    }
+
     // 1. If running on Windows desktop, Windows SAPI only has en-US voices installed by default.
     // Use the streaming voice provider for authentic Marathi and Hindi voices.
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
@@ -182,6 +192,37 @@ class TtsService {
           await _flutterTts?.speak(trimmed);
         } catch (_) {}
       }
+    }
+  }
+
+  /// FNV-1a 32-bit of the UTF-8 text; must match tool/generate_tour_audio.py.
+  static String clipHash(String text) {
+    var h = 0x811C9DC5;
+    for (final b in utf8.encode(text)) {
+      h ^= b;
+      h = (h * 0x01000193) & 0xFFFFFFFF;
+    }
+    return h.toRadixString(16).padLeft(8, '0');
+  }
+
+  Future<bool> _playBundledClip(String text, String langCode) async {
+    if (_audioPlayer == null) return false;
+    final path = 'audio/tour/${langCode}_${clipHash(text)}.mp3';
+    try {
+      // Existence check: a missing asset throws here, before playback starts.
+      await rootBundle.load('assets/$path');
+    } catch (_) {
+      return false;
+    }
+    try {
+      _usingAudioPlayer = true;
+      _onSpeechStarted();
+      await _audioPlayer?.play(AssetSource(path));
+      return true;
+    } catch (e) {
+      debugPrint('Bundled clip error: $e');
+      _usingAudioPlayer = false;
+      return false;
     }
   }
 

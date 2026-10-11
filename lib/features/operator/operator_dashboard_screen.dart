@@ -11,7 +11,7 @@ import 'package:gram_aarogya_seva/shared/widgets/dashboard_tile.dart';
 import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
 import 'package:gram_aarogya_seva/shared/widgets/queue_tile.dart';
 import 'package:gram_aarogya_seva/shared/widgets/section_header.dart';
-import 'package:gram_aarogya_seva/shared/widgets/zari_border.dart';
+import 'package:gram_aarogya_seva/shared/widgets/warli.dart';
 import 'package:gram_aarogya_seva/shared/widgets/language_toggle.dart';
 import 'package:gram_aarogya_seva/shared/widgets/notification_bell.dart';
 import 'package:gram_aarogya_seva/shared/widgets/feature_tour_overlay.dart';
@@ -155,7 +155,8 @@ class _OperatorDashboardScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Today at a glance
-              PaithaniHeader(
+              MuralHeader(
+                scene: MuralScene.register,
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

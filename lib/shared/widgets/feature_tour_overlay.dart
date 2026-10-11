@@ -285,12 +285,12 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: AppColors.zariBright,
+                          color: AppColors.spotlight,
                           width: 2.8,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.zariBright.withValues(alpha: 0.35 + (pulse * 0.35)),
+                            color: AppColors.spotlight.withValues(alpha: 0.35 + (pulse * 0.35)),
                             blurRadius: 14.0 + (pulse * 8.0),
                             spreadRadius: 2.0 + (pulse * 3.0),
                           ),
@@ -312,7 +312,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.zariBright,
+                    color: AppColors.spotlight,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -385,7 +385,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
             offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(color: AppColors.zariBright, width: 1.6),
+        border: Border.all(color: AppColors.spotlight, width: 1.6),
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -642,7 +642,7 @@ class _SpotlightHolePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final haloPaint = Paint()
-      ..color = AppColors.zariBright.withValues(alpha: 0.15 + (pulseFactor * 0.15))
+      ..color = AppColors.spotlight.withValues(alpha: 0.15 + (pulseFactor * 0.15))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6.0 + (pulseFactor * 4.0);
 

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
-/// Material 3 theme — "Paithani".
+/// Material 3 theme — "Warli wall".
 /// Key design rules:
-///  - Peacock carries every primary action; zari gold is a thin accent only
-///    (app bar edge, focus ring, one highlight per screen)
+///  - App bars and home headers are the geru wall with Warli painting;
+///    peacock carries every primary action; turmeric marks "needs you"
 ///  - Depth from tonal surfaces plus one hairline outline — no grey shadows
 ///  - 56dp+ tap targets, 18sp min body text
 ///  - Radius encodes hierarchy: 24 hero / sheets, 18 cards, 14 controls
@@ -61,9 +61,9 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.surface,
       splashFactory: InkSparkle.splashFactory,
 
-      // ── AppBar — peacock with a zari edge
+      // ── AppBar — the geru wall with a turmeric edge
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.geru,
         foregroundColor: AppColors.onPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -72,7 +72,7 @@ class AppTheme {
         toolbarHeight: 64,
         surfaceTintColor: Colors.transparent,
         shape: Border(
-          bottom: BorderSide(color: AppColors.zari, width: 2),
+          bottom: BorderSide(color: AppColors.zariBright, width: 3),
         ),
         iconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
         actionsIconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
@@ -284,7 +284,7 @@ class AppTheme {
       // ── TabBar — zari underline
       tabBarTheme: TabBarThemeData(
         labelColor: AppColors.onPrimary,
-        unselectedLabelColor: AppColors.onPrimaryContainer,
+        unselectedLabelColor: AppColors.onMuralMuted,
         indicatorColor: AppColors.zariBright,
         indicatorSize: TabBarIndicatorSize.label,
         dividerColor: Colors.transparent,

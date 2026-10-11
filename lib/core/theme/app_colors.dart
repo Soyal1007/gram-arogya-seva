@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens — "Paithani".
+/// Design tokens — "Warli wall".
 ///
-/// Drawn from Maharashtra's Paithani silk: a deep peacock-green body with a
-/// thin zari (gold thread) border. Peacock carries the brand and every primary
-/// action; zari is an accent only — thin rules, focus rings, the one highlight
-/// on a screen — never a fill behind text. Contrast of every text/background
+/// Drawn from Warli painting, the village art of the Maharashtra hills:
+/// rice-white figures on a geru (red-earth) wall. Headers are the painted
+/// wall; peacock green carries every action; turmeric (the `zari*` tokens)
+/// is the accent for "needs your attention" — never a fill behind text. Contrast of every text/background
 /// pair used here is ≥ 4.5:1 for outdoor readability (SRS DP-1).
 class AppColors {
   AppColors._();
@@ -26,10 +26,25 @@ class AppColors {
   // ZARI — gold thread accent. Rules, focus, highlights; never body text
   // on light surfaces (use zariDeep for that).
   // ═══════════════════════════════════════════════════
-  static const Color zari = Color(0xFFB8912F);
-  static const Color zariBright = Color(0xFFD9B45A);
-  static const Color zariDeep = Color(0xFF7A5E17);
-  static const Color zariSoft = Color(0xFFF6EDD3);
+  static const Color zari = Color(0xFFD99A14);
+  static const Color zariBright = Color(0xFFF2B632);
+  static const Color zariDeep = Color(0xFF7A5300);
+  static const Color zariSoft = Color(0xFFFBEFCF);
+
+  // ═══════════════════════════════════════════════════
+  // GERU — the red-earth mud wall Warli paintings are made on. Headers and
+  // the splash are painted geru with rice-white Warli figures; actions stay
+  // peacock so "wall" and "button" never look alike.
+  // ═══════════════════════════════════════════════════
+  static const Color geru = Color(0xFF8C3B1F);
+  static const Color geruDeep = Color(0xFF6B2913);
+  static const Color geruLight = Color(0xFFA9532F);
+  static const Color onMural = Color(0xFFFFF8EE);
+  static const Color onMuralMuted = Color(0xFFF3D8C6);
+
+  /// Guided-tour spotlight: marigold, chosen to stand apart from every
+  /// other colour on screen so the highlighted control is unmistakable.
+  static const Color spotlight = Color(0xFFFF6B1A);
 
   // ═══════════════════════════════════════════════════
   // SECONDARY — Leaf green (success / accepted)
@@ -167,6 +182,14 @@ class AppColors {
   static const LinearGradient healingGradient = LinearGradient(
     colors: [primaryDeep, primary, primaryContainer],
     stops: [0.0, 0.55, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Mud wall — geru, slightly lit from the top left like a painted wall.
+  static const LinearGradient muralGradient = LinearGradient(
+    colors: [geruLight, geru, geruDeep],
+    stops: [0.0, 0.5, 1.0],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

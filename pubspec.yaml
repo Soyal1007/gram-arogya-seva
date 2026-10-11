@@ -57,6 +57,7 @@ flutter:
     - assets/l10n/
     - assets/icons/
     - assets/images/
+    - assets/audio/tour/
 
   # Bundled, not fetched at runtime: target users are on slow networks, and
   # both families cover Devanagari so mr/hi render in the designed type.
@@ -70,6 +71,6 @@ flutter:
           weight: 600
         - asset: assets/fonts/Mukta-Bold.ttf
           weight: 700
-    - family: TiroDevanagariMarathi
+    - family: YatraOne
       fonts:
-        - asset: assets/fonts/TiroDevanagariMarathi-Regular.ttf
+        - asset: assets/fonts/YatraOne-Regular.ttf

@@ -9,7 +9,7 @@ import 'package:gram_aarogya_seva/shared/widgets/language_toggle.dart';
 import 'package:gram_aarogya_seva/shared/widgets/notification_bell.dart';
 import 'package:gram_aarogya_seva/shared/widgets/dashboard_tile.dart';
 import 'package:gram_aarogya_seva/shared/widgets/section_header.dart';
-import 'package:gram_aarogya_seva/shared/widgets/zari_border.dart';
+import 'package:gram_aarogya_seva/shared/widgets/warli.dart';
 import 'package:gram_aarogya_seva/shared/widgets/feature_tour_overlay.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
 
@@ -172,7 +172,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Programme at a glance
-              PaithaniHeader(
+              MuralHeader(
+                scene: MuralScene.office,
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 22),
                 child: Container(
                   key: _statsGridKey,

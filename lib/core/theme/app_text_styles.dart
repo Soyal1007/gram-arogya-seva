@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 /// Typography — "Paithani".
-/// Display / headline: Tiro Devanagari Marathi — a book serif with matching
-///   Latin and Devanagari, used for greetings and screen titles only. It ships
-///   in one weight: never bold it (Flutter would fake the bold).
+/// Display / headline: Yatra One — a brush-lettered Devanagari display face
+///   (with matching Latin) in the spirit of hand-painted village signboards.
+///   Greetings and screen titles only. One weight: never bold it (Flutter
+///   would fake the bold).
 /// Everything else: Mukta — a humanist sans designed for Devanagari, with
 ///   Latin to match. Minimum body 18sp (SRS DP-1 rural-first rule).
 /// Both families are bundled in assets/fonts so nothing is fetched at runtime.
 class AppTextStyles {
   AppTextStyles._();
 
-  static const String serif = 'TiroDevanagariMarathi';
+  static const String serif = 'YatraOne';
   static const String sans = 'Mukta';
 
   // ═══════════════════════════════════════════════════
