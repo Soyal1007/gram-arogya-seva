@@ -202,7 +202,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      'No profile picture set. Tap Edit to add one.',
+                      tr('no_profile_photo_hint'),
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.outline),
                       textAlign: TextAlign.center,

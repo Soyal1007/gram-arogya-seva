@@ -14,10 +14,16 @@ final ttsServiceProvider = Provider<TtsService>((ref) {
   return service;
 });
 
-/// High-reliability multi-lingual Text-to-Speech service for Marathi, Hindi, and English.
-/// Combines native Google TTS engine with an online streaming voice fallback (audioplayers)
-/// to ensure crystal-clear voice instructions across all platforms (Android, Windows, Web, Emulator)
-/// even when the host system lacks local Marathi or Hindi voice packs.
+/// Multi-lingual voice guidance for Marathi, Hindi and English.
+///
+/// Order of preference:
+///  1. A pre-recorded clip bundled in assets/audio/tour (Marathi / Hindi tour
+///     narration) — works offline, on every phone.
+///  2. The device's own TTS engine.
+///
+/// There is deliberately no online fallback: the earlier build streamed text
+/// to an unofficial Google Translate endpoint, which is not licensed for app
+/// use, can be blocked at any time, and sends text off the device.
 class TtsService {
   TtsService() {
     _initTts();
@@ -119,19 +125,8 @@ class TtsService {
     }
   }
 
-  /// Builds a clean Google TTS stream URL for high-fidelity speech synthesis.
-  String _buildStreamingTtsUrl(String text, String langCode) {
-    final cleanLang = langCode.startsWith('mr')
-        ? 'mr'
-        : langCode.startsWith('hi')
-            ? 'hi'
-            : 'en';
-    final encoded = Uri.encodeQueryComponent(text.trim());
-    return 'https://translate.google.com/translate_tts?ie=UTF-8&tl=$cleanLang&client=tw-ob&q=$encoded';
-  }
-
   /// Speaks the provided text in Marathi, Hindi, or English.
-  /// Automatically selects the best available engine (native TTS or crystal-clear streaming voice).
+  /// Uses a bundled clip when one exists, otherwise the device TTS engine.
   Future<void> speak(String text, {String? languageCode}) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
@@ -147,15 +142,6 @@ class TtsService {
     if (targetLang == 'mr' || targetLang == 'hi') {
       final played = await _playBundledClip(trimmed, targetLang);
       if (played) return;
-    }
-
-    // 1. If running on Windows desktop, Windows SAPI only has en-US voices installed by default.
-    // Use the streaming voice provider for authentic Marathi and Hindi voices.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
-      if (targetLang == 'mr' || targetLang == 'hi') {
-        final played = await _playViaStreamingVoice(trimmed, targetLang);
-        if (played) return;
-      }
     }
 
     // 2. Try native FlutterTts first (ideal for offline and devices with language packs)
@@ -183,14 +169,13 @@ class TtsService {
       }
     }
 
-    // 3. If native engine was unable to speak the regional language, stream voice cleanly
-    if (!nativeSuccess) {
-      final played = await _playViaStreamingVoice(trimmed, targetLang);
-      if (!played && _flutterTts != null) {
-        // Last-resort fallback: attempt whatever native voice is configured
-        try {
-          await _flutterTts?.speak(trimmed);
-        } catch (_) {}
+    // 3. No voice for this language on the device: try whatever voice is
+    // configured rather than staying silent.
+    if (!nativeSuccess && _flutterTts != null) {
+      try {
+        await _flutterTts?.speak(trimmed);
+      } catch (_) {
+        _onSpeechEnded();
       }
     }
   }
@@ -221,21 +206,6 @@ class TtsService {
       return true;
     } catch (e) {
       debugPrint('Bundled clip error: $e');
-      _usingAudioPlayer = false;
-      return false;
-    }
-  }
-
-  Future<bool> _playViaStreamingVoice(String text, String langCode) async {
-    if (_audioPlayer == null) return false;
-    try {
-      final url = _buildStreamingTtsUrl(text, langCode);
-      _usingAudioPlayer = true;
-      _onSpeechStarted();
-      await _audioPlayer?.play(UrlSource(url));
-      return true;
-    } catch (e) {
-      debugPrint('Streaming audio error: $e');
       _usingAudioPlayer = false;
       return false;
     }

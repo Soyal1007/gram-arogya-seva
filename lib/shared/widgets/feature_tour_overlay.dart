@@ -284,15 +284,17 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18),
+                        // Glow only: soft white light that breathes, no
+                        // coloured ring, so the control keeps its own look.
                         border: Border.all(
-                          color: AppColors.spotlight,
-                          width: 2.8,
+                          color: AppColors.spotlight.withValues(alpha: 0.55 + (pulse * 0.35)),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.spotlight.withValues(alpha: 0.35 + (pulse * 0.35)),
-                            blurRadius: 14.0 + (pulse * 8.0),
-                            spreadRadius: 2.0 + (pulse * 3.0),
+                            color: AppColors.spotlight.withValues(alpha: 0.30 + (pulse * 0.35)),
+                            blurRadius: 18.0 + (pulse * 14.0),
+                            spreadRadius: 1.0 + (pulse * 4.0),
                           ),
                         ],
                       ),
@@ -385,7 +387,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
             offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(color: AppColors.spotlight, width: 1.6),
+        border: Border.all(color: AppColors.outlineVariant),
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -638,13 +640,14 @@ class _SpotlightHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final backgroundPaint = Paint()
-      ..color = AppColors.primaryDeep.withValues(alpha: 0.76)
+      ..color = Colors.black.withValues(alpha: 0.72)
       ..style = PaintingStyle.fill;
 
     final haloPaint = Paint()
-      ..color = AppColors.spotlight.withValues(alpha: 0.15 + (pulseFactor * 0.15))
+      ..color = AppColors.spotlight.withValues(alpha: 0.10 + (pulseFactor * 0.15))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0 + (pulseFactor * 4.0);
+      ..strokeWidth = 6.0 + (pulseFactor * 6.0)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, 6 + pulseFactor * 4);
 
     final wholeScreen = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 

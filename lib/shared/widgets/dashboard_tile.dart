@@ -75,7 +75,7 @@ class DashboardTile extends StatelessWidget {
                         '$badge',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.geruDeep,
+                          color: AppColors.primaryDeep,
                         ),
                       ),
                     ),
@@ -140,7 +140,7 @@ class HeaderStats extends StatelessWidget {
           width: 1,
           height: 40,
           margin: const EdgeInsets.symmetric(horizontal: 12),
-          color: AppColors.onMural.withValues(alpha: 0.4),
+          color: AppColors.onPrimary.withValues(alpha: 0.4),
         ));
       }
       final (label, value) = stats[i];
@@ -151,7 +151,7 @@ class HeaderStats extends StatelessWidget {
             Text(
               value,
               style: AppTextStyles.displayMedium.copyWith(
-                color: AppColors.onMural,
+                color: AppColors.onPrimary,
                 height: 1.1,
               ),
             ),
@@ -160,7 +160,7 @@ class HeaderStats extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.onMuralMuted,
+                color: AppColors.onPrimaryContainer,
               ),
             ),
           ],

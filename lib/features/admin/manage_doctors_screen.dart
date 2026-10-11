@@ -5,13 +5,18 @@ import 'package:gram_aarogya_seva/core/config/app_constants.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
+import 'package:gram_aarogya_seva/core/errors/app_exception.dart';
 import 'package:gram_aarogya_seva/core/models/doctor_model.dart';
+import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
 import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
 
-/// SRS §11.1 A-FLOW-01: Manage all doctors (view, activate, deactivate).
+/// SRS §11.1 A-FLOW-01: Manage all doctors (view, activate, deactivate), and
+/// cancel a doctor's whole day when the doctor cannot do it themself — e.g.
+/// they are ill and only phoned the office. `cancelDoctorDay` already
+/// authorises admins; this screen was the missing entry point.
 class ManageDoctorsScreen extends ConsumerWidget {
   const ManageDoctorsScreen({super.key});
 
@@ -105,6 +110,17 @@ class ManageDoctorsScreen extends ConsumerWidget {
                           icon: const Icon(Icons.check, size: 18),
                           label: Text(tr('activate')),
                         ),
+                      if (doc.status == AppConstants.doctorActive) ...[
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () => _cancelDay(context, ref, doc),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                          ),
+                          icon: const Icon(Icons.event_busy_outlined),
+                          label: Text(tr('cancel_day')),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -116,6 +132,44 @@ class ManageDoctorsScreen extends ConsumerWidget {
         error: (e, _) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
+  }
+
+  /// Picks a date, confirms, then cancels every open appointment the doctor
+  /// has that day. Patients are notified server-side.
+  Future<void> _cancelDay(
+      BuildContext context, WidgetRef ref, DoctorModel doctor) async {
+    final today = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: DateTime(today.year, today.month, today.day),
+      lastDate: today.add(const Duration(days: 60)),
+      helpText: tr('cancel_day'),
+    );
+    if (picked == null || !context.mounted) return;
+
+    final dateStr = AppDateUtils.toSchemaDate(picked);
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: tr('cancel_day'),
+      message: '${doctor.name}\n'
+          '${tr('cancel_day_confirm', args: [AppDateUtils.toDisplayDate(dateStr)])}',
+      confirmLabel: tr('cancel_day'),
+      confirmColor: AppColors.error,
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final cancelled = await ref
+          .read(functionsServiceProvider)
+          .cancelDoctorDay(doctorId: doctor.doctorId, date: dateStr);
+      messenger.showSnackBar(
+        SnackBar(content: Text(tr('cancel_day_done', args: ['$cancelled']))),
+      );
+    } on AppException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(tr(e.messageKey))));
+    }
   }
 
   /// Confirms, then applies an activation state change.

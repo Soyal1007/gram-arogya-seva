@@ -35,13 +35,13 @@ class NotificationBell extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: AppColors.zariBright,
                   borderRadius: BorderRadius.circular(9),
-                  border: Border.all(color: AppColors.geru, width: 1.5),
+                  border: Border.all(color: AppColors.primary, width: 1.5),
                 ),
                 child: Text(
                   unread > 9 ? '9+' : '$unread',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: AppColors.geruDeep,
+                    color: AppColors.primaryDeep,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     height: 1.1,

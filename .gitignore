@@ -56,3 +56,7 @@ ui-debug.log
 
 # Temporary / Empty leftover folders
 gram_aarogya_seva-main/
+
+# Release signing material — never commit
+*.jks
+*.keystore

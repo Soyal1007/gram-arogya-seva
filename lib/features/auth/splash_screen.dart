@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
-import 'package:gram_aarogya_seva/shared/widgets/warli.dart';
+import 'package:gram_aarogya_seva/shared/widgets/home_header.dart';
 
 /// Splash screen shown while Firebase + auth state loads.
 class SplashScreen extends ConsumerWidget {
@@ -12,7 +12,7 @@ class SplashScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppColors.muralGradient),
+        decoration: const BoxDecoration(gradient: AppColors.healingGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -22,7 +22,7 @@ class SplashScreen extends ConsumerWidget {
               Text(
                 'ग्राम आरोग्य सेवा',
                 style: AppTextStyles.displayMedium.copyWith(
-                  color: AppColors.onMural,
+                  color: AppColors.onPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -30,14 +30,9 @@ class SplashScreen extends ConsumerWidget {
               Text(
                 'Gram Aarogya Seva',
                 style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.onMuralMuted,
+                  color: AppColors.onPrimaryContainer,
                   fontWeight: FontWeight.w500,
                 ),
-              ),
-              const SizedBox(height: 28),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 48),
-                child: WarliBand(height: 40),
               ),
               const Spacer(flex: 2),
               const SizedBox(

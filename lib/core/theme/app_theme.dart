@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
-/// Material 3 theme — "Warli wall".
+/// Material 3 theme — simple village palette.
 /// Key design rules:
-///  - App bars and home headers are the geru wall with Warli painting;
-///    peacock carries every primary action; turmeric marks "needs you"
+///  - One brand green for app bars, headers and primary actions;
+///    turmeric marks "needs you"; red is for errors and emergency only
 ///  - Depth from tonal surfaces plus one hairline outline — no grey shadows
 ///  - 56dp+ tap targets, 18sp min body text
 ///  - Radius encodes hierarchy: 24 hero / sheets, 18 cards, 14 controls
@@ -61,9 +61,9 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.surface,
       splashFactory: InkSparkle.splashFactory,
 
-      // ── AppBar — the geru wall with a turmeric edge
+      // ── AppBar — solid brand green, flows into the home header
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.geru,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.onPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -71,15 +71,12 @@ class AppTheme {
         titleSpacing: 20,
         toolbarHeight: 64,
         surfaceTintColor: Colors.transparent,
-        shape: Border(
-          bottom: BorderSide(color: AppColors.zariBright, width: 3),
-        ),
         iconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
         actionsIconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
         titleTextStyle: TextStyle(
-          fontFamily: AppTextStyles.serif,
-          fontSize: 24,
-          fontWeight: FontWeight.w400,
+          fontFamily: AppTextStyles.sans,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
           color: AppColors.onPrimary,
         ),
       ),
@@ -284,7 +281,7 @@ class AppTheme {
       // ── TabBar — zari underline
       tabBarTheme: TabBarThemeData(
         labelColor: AppColors.onPrimary,
-        unselectedLabelColor: AppColors.onMuralMuted,
+        unselectedLabelColor: AppColors.onPrimaryContainer,
         indicatorColor: AppColors.zariBright,
         indicatorSize: TabBarIndicatorSize.label,
         dividerColor: Colors.transparent,

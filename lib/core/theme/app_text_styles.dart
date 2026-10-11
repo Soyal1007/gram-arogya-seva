@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Typography — "Paithani".
-/// Display / headline: Yatra One — a brush-lettered Devanagari display face
-///   (with matching Latin) in the spirit of hand-painted village signboards.
-///   Greetings and screen titles only. One weight: never bold it (Flutter
-///   would fake the bold).
-/// Everything else: Mukta — a humanist sans designed for Devanagari, with
-///   Latin to match. Minimum body 18sp (SRS DP-1 rural-first rule).
-/// Both families are bundled in assets/fonts so nothing is fetched at runtime.
+/// Typography — one family, Mukta: a humanist sans designed for Devanagari,
+/// with Latin to match, bundled in assets/fonts (nothing fetched at runtime).
+/// Hierarchy comes from size and weight only. Minimum body 18sp (SRS DP-1).
+/// `serif` is kept as the name of the display role so call sites need not
+/// change.
 class AppTextStyles {
   AppTextStyles._();
 
-  static const String serif = 'YatraOne';
+  static const String serif = 'Mukta';
   static const String sans = 'Mukta';
 
   // ═══════════════════════════════════════════════════
@@ -20,20 +17,20 @@ class AppTextStyles {
   // ═══════════════════════════════════════════════════
   static TextStyle get displayLarge => const TextStyle(
         fontFamily: serif,
-        fontSize: 38,
-        fontWeight: FontWeight.w400,
+        fontSize: 34,
+        fontWeight: FontWeight.w700,
         color: AppColors.onSurface,
         height: 1.2,
-        letterSpacing: -0.4,
+        letterSpacing: -0.2,
       );
 
   static TextStyle get displayMedium => const TextStyle(
         fontFamily: serif,
-        fontSize: 32,
-        fontWeight: FontWeight.w400,
+        fontSize: 30,
+        fontWeight: FontWeight.w700,
         color: AppColors.onSurface,
         height: 1.2,
-        letterSpacing: -0.3,
+        letterSpacing: -0.2,
       );
 
   // ═══════════════════════════════════════════════════
@@ -41,8 +38,8 @@ class AppTextStyles {
   // ═══════════════════════════════════════════════════
   static TextStyle get headlineLarge => const TextStyle(
         fontFamily: serif,
-        fontSize: 28,
-        fontWeight: FontWeight.w400,
+        fontSize: 26,
+        fontWeight: FontWeight.w700,
         color: AppColors.onSurface,
         height: 1.25,
         letterSpacing: -0.2,
@@ -50,8 +47,8 @@ class AppTextStyles {
 
   static TextStyle get headlineMedium => const TextStyle(
         fontFamily: serif,
-        fontSize: 24,
-        fontWeight: FontWeight.w400,
+        fontSize: 23,
+        fontWeight: FontWeight.w700,
         color: AppColors.onSurface,
         height: 1.3,
       );

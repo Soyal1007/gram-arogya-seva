@@ -204,8 +204,8 @@ cancelled, on a real device, against real Firebase.
 | App Check | ✅ Implemented — register the debug token per test device |
 | Reminder scheduler | ✅ Implemented (hourly, 24h horizon) |
 | Operator module completion | ✅ Implemented |
-| Pagination | ⬜ Outstanding — lists silently wrong past 20 rows |
-| Reference-data read cost (§4.1) | ⬜ Outstanding |
+| Pagination | ✅ Implemented — growing-limit "Load more" (`pagination_provider.dart`) |
+| Reference-data read cost (§4.1) | ✅ Implemented — `reference/current` aggregate, collection fallback |
 | Photos to Storage (§4.4) | ⬜ Outstanding |
 
 ### Phase C — Make it releasable (1–2 weeks, overlaps B)

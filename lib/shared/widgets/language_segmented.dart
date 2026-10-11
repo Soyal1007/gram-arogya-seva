@@ -29,12 +29,12 @@ class LanguageSegmented extends ConsumerWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: onDark
-            ? AppColors.geruDeep.withValues(alpha: 0.55)
+            ? AppColors.primaryDeep.withValues(alpha: 0.55)
             : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: onDark
-              ? AppColors.onMural.withValues(alpha: 0.45)
+              ? AppColors.onPrimary.withValues(alpha: 0.45)
               : AppColors.outlineVariant,
         ),
       ),
@@ -74,9 +74,9 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedBg = onDark ? AppColors.onMural : AppColors.primary;
-    final selectedFg = onDark ? AppColors.geruDeep : AppColors.onPrimary;
-    final idleFg = onDark ? AppColors.onMural : AppColors.onSurface;
+    final selectedBg = onDark ? AppColors.onPrimary : AppColors.primary;
+    final selectedFg = onDark ? AppColors.primaryDeep : AppColors.onPrimary;
+    final idleFg = onDark ? AppColors.onPrimary : AppColors.onSurface;
 
     return Semantics(
       selected: selected,

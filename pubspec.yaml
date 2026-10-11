@@ -71,6 +71,3 @@ flutter:
           weight: 600
         - asset: assets/fonts/Mukta-Bold.ttf
           weight: 700
-    - family: YatraOne
-      fonts:
-        - asset: assets/fonts/YatraOne-Regular.ttf

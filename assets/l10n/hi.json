@@ -303,5 +303,6 @@
   "village_label_short": "गाँव",
   "patient_greeting": "नमस्ते, {}",
   "previous": "पीछे",
-  "next_step": "आगे बढ़ें"
+  "next_step": "आगे बढ़ें",
+  "no_profile_photo_hint": "अभी प्रोफ़ाइल फ़ोटो नहीं है. जोड़ने के लिए संपादित करें दबाएँ."
 }

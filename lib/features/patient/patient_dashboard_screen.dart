@@ -22,7 +22,7 @@ import 'package:gram_aarogya_seva/shared/widgets/date_leaf.dart';
 import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
 import 'package:gram_aarogya_seva/shared/widgets/language_segmented.dart';
 import 'package:gram_aarogya_seva/shared/widgets/section_header.dart';
-import 'package:gram_aarogya_seva/shared/widgets/warli.dart';
+import 'package:gram_aarogya_seva/shared/widgets/home_header.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
 
 /// Patient Home Screen — Rural Healthcare Interface.
@@ -181,8 +181,7 @@ class _PatientDashboardScreenState extends ConsumerState<PatientDashboardScreen>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // 1. Peacock header: who and where, then language
-              MuralHeader(
-                scene: MuralScene.village,
+              HomeHeader(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,7 +604,7 @@ class _NoProfileGreeting extends StatelessWidget {
         Text(
           tr('tap_create_profile'),
           style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.onMuralMuted,
+            color: AppColors.onPrimaryContainer,
           ),
         ),
         const SizedBox(height: 14),
@@ -613,7 +612,7 @@ class _NoProfileGreeting extends StatelessWidget {
           onPressed: () => context.push(AppConstants.routePatientProfile),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.zariBright,
-            foregroundColor: AppColors.geruDeep,
+            foregroundColor: AppColors.primaryDeep,
             minimumSize: const Size(0, 52),
             padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
@@ -660,7 +659,7 @@ class _ProfileGreeting extends ConsumerWidget {
                     child: Text(
                       '${tr("village_label_short")}: ${villageName ?? tr("loading")}',
                       style: AppTextStyles.bodyLarge.copyWith(
-                        color: AppColors.onMuralMuted,
+                        color: AppColors.onPrimaryContainer,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

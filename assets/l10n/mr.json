@@ -303,5 +303,6 @@
   "village_label_short": "गाव",
   "patient_greeting": "नमस्कार, {}",
   "previous": "मागे",
-  "next_step": "पुढे चला"
+  "next_step": "पुढे चला",
+  "no_profile_photo_hint": "अजून प्रोफाइल फोटो नाही. जोडण्यासाठी संपादित करा दाबा."
 }

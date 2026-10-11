@@ -10,7 +10,7 @@ import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/guided_tour_dialog.dart';
 import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
 import 'package:gram_aarogya_seva/shared/widgets/language_segmented.dart';
-import 'package:gram_aarogya_seva/shared/widgets/warli.dart';
+import 'package:gram_aarogya_seva/shared/widgets/home_header.dart';
 import 'package:gram_aarogya_seva/core/models/user_model.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/features/auth/auth_notifier.dart';
@@ -60,8 +60,7 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Peacock hero with the app mark and name
-            MuralHeader(
-                scene: MuralScene.village,
+            HomeHeader(
               padding: EdgeInsets.fromLTRB(
                 24,
                 MediaQuery.paddingOf(context).top + 36,

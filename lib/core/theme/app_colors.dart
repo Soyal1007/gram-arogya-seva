@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens — "Warli wall".
+/// Design tokens — simple village palette.
 ///
-/// Drawn from Warli painting, the village art of the Maharashtra hills:
-/// rice-white figures on a geru (red-earth) wall. Headers are the painted
-/// wall; peacock green carries every action; turmeric (the `zari*` tokens)
-/// is the accent for "needs your attention" — never a fill behind text. Contrast of every text/background
+/// One brand green for headers and every action, white cards on a soft
+/// grey-green page, turmeric (the `zari*` tokens) only for "needs your
+/// attention", red only for errors and emergency. Few colours, each with one
+/// meaning, so the screen is easy to read for first-time smartphone users. Contrast of every text/background
 /// pair used here is ≥ 4.5:1 for outdoor readability (SRS DP-1).
 class AppColors {
   AppColors._();
@@ -31,20 +31,9 @@ class AppColors {
   static const Color zariDeep = Color(0xFF7A5300);
   static const Color zariSoft = Color(0xFFFBEFCF);
 
-  // ═══════════════════════════════════════════════════
-  // GERU — the red-earth mud wall Warli paintings are made on. Headers and
-  // the splash are painted geru with rice-white Warli figures; actions stay
-  // peacock so "wall" and "button" never look alike.
-  // ═══════════════════════════════════════════════════
-  static const Color geru = Color(0xFF8C3B1F);
-  static const Color geruDeep = Color(0xFF6B2913);
-  static const Color geruLight = Color(0xFFA9532F);
-  static const Color onMural = Color(0xFFFFF8EE);
-  static const Color onMuralMuted = Color(0xFFF3D8C6);
-
-  /// Guided-tour spotlight: marigold, chosen to stand apart from every
-  /// other colour on screen so the highlighted control is unmistakable.
-  static const Color spotlight = Color(0xFFFF6B1A);
+  /// Guided-tour spotlight: a plain white glow, so the highlighted control
+  /// keeps its own colours and nothing new is introduced on screen.
+  static const Color spotlight = Color(0xFFFFFFFF);
 
   // ═══════════════════════════════════════════════════
   // SECONDARY — Leaf green (success / accepted)
@@ -180,16 +169,7 @@ class AppColors {
   /// Peacock silk — the header and hero-card fill. Name kept for existing
   /// call sites.
   static const LinearGradient healingGradient = LinearGradient(
-    colors: [primaryDeep, primary, primaryContainer],
-    stops: [0.0, 0.55, 1.0],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  /// Mud wall — geru, slightly lit from the top left like a painted wall.
-  static const LinearGradient muralGradient = LinearGradient(
-    colors: [geruLight, geru, geruDeep],
-    stops: [0.0, 0.5, 1.0],
+    colors: [primary, primaryContainer],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
