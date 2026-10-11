@@ -11,7 +11,9 @@ import 'package:gram_aarogya_seva/core/providers/connectivity_provider.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
 import 'package:gram_aarogya_seva/core/models/appointment_model.dart';
 import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
+import 'package:gram_aarogya_seva/shared/widgets/date_leaf.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
+import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
 import 'package:gram_aarogya_seva/shared/widgets/no_network_banner.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
 
@@ -61,7 +63,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         title: Text(tr('book_appointment')),
         leading: draft.step > 0
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: () => ref.read(bookingDraftProvider.notifier).back(),
               )
             : null,
@@ -75,12 +77,12 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           }),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _StepRow(currentStep: draft.step),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 28),
                   if (draft.step == 0) _buildDoctorSelection(draft),
                   if (draft.step == 1) _buildDateSlotSelection(draft),
                   if (draft.step == 2) _buildReasonAndConfirm(draft),
@@ -102,8 +104,8 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('select_doctor'), style: AppTextStyles.headlineSmall),
-        const SizedBox(height: 12),
+        Text(tr('select_doctor'), style: AppTextStyles.headlineMedium),
+        const SizedBox(height: 16),
 
         if (activeVillages.isEmpty)
           const LinearProgressIndicator()
@@ -115,7 +117,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                     : null,
             decoration: InputDecoration(
               labelText: tr('filter_by_village'),
-              prefixIcon: const Icon(Icons.filter_list),
+              prefixIcon: const Icon(Icons.location_on_outlined),
             ),
             items: [
               DropdownMenuItem(value: null, child: Text(tr('all_villages'))),
@@ -142,22 +144,27 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
             return Column(
               children: doctors.map((doc) {
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  clipBehavior: Clip.antiAlias,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          AppColors.secondary.withValues(alpha: 0.1),
-                      child: const Icon(Icons.medical_services,
-                          color: AppColors.secondary),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    leading: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Icons.medical_services_outlined,
+                          color: AppColors.primary),
                     ),
                     title: Text(tr('doctor_name', args: [doc.name]),
                         style: AppTextStyles.titleLarge),
                     subtitle: Text(doc.specialization,
                         style: AppTextStyles.bodyMedium),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: AppColors.outline, size: 28),
                     onTap: () => notifier.selectDoctor(doc),
                   ),
                 );
@@ -186,57 +193,32 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(tr('doctor_name', args: [doctor.name]),
-            style: AppTextStyles.headlineSmall),
+            style: AppTextStyles.headlineMedium),
         Text(doctor.specialization, style: AppTextStyles.bodyMedium),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         Text(tr('select_date'), style: AppTextStyles.titleLarge),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
           child: Row(
             children: List.generate(8, (i) {
               final date = DateTime.now().add(Duration(days: i));
               final dateStr = AppDateUtils.toSchemaDate(date);
-              final isSelected = draft.date == dateStr;
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  label: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        i == 0
-                            ? tr('today')
-                            : AppDateUtils.toShortDisplayDate(dateStr),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isSelected
-                              ? AppColors.onPrimary
-                              : AppColors.onSurface,
-                        ),
-                      ),
-                      Text(
-                        '${date.day}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? AppColors.onPrimary
-                              : AppColors.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                  selected: isSelected,
-                  selectedColor: AppColors.primary,
-                  onSelected: (_) => notifier.selectDate(dateStr),
+                padding: const EdgeInsets.only(right: 10),
+                child: _DateOption(
+                  schemaDate: dateStr,
+                  isToday: i == 0,
+                  selected: draft.date == dateStr,
+                  onTap: () => notifier.selectDate(dateStr),
                 ),
               );
             }),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         if (draft.date != null)
           availAsync.when(
@@ -284,30 +266,31 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Row(
                         children: [
-                          const Icon(Icons.local_hospital,
-                              size: 18, color: AppColors.primary),
-                          const SizedBox(width: 6),
+                          const Icon(Icons.local_hospital_outlined,
+                              size: 22, color: AppColors.primary),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(centerName,
-                                style: AppTextStyles.bodyMedium
+                                style: AppTextStyles.titleMedium
                                     .copyWith(color: AppColors.primary)),
                           ),
                         ],
                       ),
                     ),
                   Text(tr('select_time_slot'), style: AppTextStyles.titleLarge),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: 10,
+                    runSpacing: 10,
                     children: openSlots.map((slot) {
                       final isSelected = draft.timeSlot == slot.time;
                       return ChoiceChip(
+                        showCheckmark: false,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
                         label: Text(
                           AppDateUtils.formatSlotForDisplay(slot.time),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          style: AppTextStyles.titleMedium.copyWith(
                             color: isSelected
                                 ? AppColors.onPrimary
                                 : AppColors.onSurface,
@@ -315,6 +298,12 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                         ),
                         selected: isSelected,
                         selectedColor: AppColors.primary,
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.zari
+                              : AppColors.outlineVariant,
+                          width: isSelected ? 1.5 : 1,
+                        ),
                         onSelected: (_) => notifier.selectSlot(slot.time),
                       );
                     }).toList(),
@@ -330,7 +319,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         if (draft.timeSlot != null)
           LargeButton(
             label: tr('next'),
-            icon: Icons.arrow_forward,
+            icon: Icons.arrow_forward_rounded,
             onPressed: () => notifier.goToStep(2),
           ),
       ],
@@ -349,36 +338,48 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('appointment_details'), style: AppTextStyles.headlineSmall),
+        Text(tr('appointment_details'), style: AppTextStyles.headlineMedium),
         const SizedBox(height: 16),
 
+        // Summary of what is being booked, so the patient checks it once
+        // before the form below.
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.zari, width: 1.2),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(tr('doctor_name', args: [draft.doctor!.name]),
-                  style: AppTextStyles.titleLarge),
-              Text(
-                '${AppDateUtils.toDisplayDate(draft.date!)} • '
-                '${AppDateUtils.formatSlotForDisplay(draft.timeSlot!)}',
-                style: AppTextStyles.bodyMedium,
+              DateLeaf(schemaDate: draft.date!),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppDateUtils.formatSlotForDisplay(draft.timeSlot!),
+                      style: AppTextStyles.titleLarge,
+                    ),
+                    Text(tr('doctor_name', args: [draft.doctor!.name]),
+                        style: AppTextStyles.bodyLarge),
+                    Text(AppDateUtils.toDisplayDate(draft.date!),
+                        style: AppTextStyles.caption),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         DropdownButtonFormField<String>(
           initialValue: draft.reason,
           decoration: InputDecoration(
             labelText: tr('reason_for_visit'),
-            prefixIcon: const Icon(Icons.note),
+            prefixIcon: const Icon(Icons.notes_rounded),
           ),
           items: AppConstants.appointmentReasons
               .map((r) => DropdownMenuItem(
@@ -396,7 +397,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           style: AppTextStyles.bodyLarge,
           decoration: InputDecoration(
             labelText: tr('symptoms_optional'),
-            border: const OutlineInputBorder(),
+            alignLabelWithHint: true,
           ),
         ),
         const SizedBox(height: 12),
@@ -405,7 +406,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           style: AppTextStyles.bodyLarge,
           decoration: InputDecoration(
             labelText: tr('duration_label'),
-            prefixIcon: const Icon(Icons.schedule),
+            prefixIcon: const Icon(Icons.schedule_rounded),
           ),
         ),
         const SizedBox(height: 12),
@@ -414,7 +415,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           initialValue: draft.severity,
           decoration: InputDecoration(
             labelText: tr('severity_label'),
-            prefixIcon: const Icon(Icons.thermostat),
+            prefixIcon: const Icon(Icons.thermostat_rounded),
           ),
           items: [
             DropdownMenuItem(
@@ -433,15 +434,12 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
 
         if (!isOnline)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              tr('booking_requires_network'),
-              style: AppTextStyles.caption.copyWith(color: AppColors.error),
-            ),
+            padding: const EdgeInsets.only(bottom: 12),
+            child: InlineError(message: tr('booking_requires_network')),
           ),
         LargeButton(
           label: tr('confirm_booking'),
-          icon: Icons.check_circle_outline,
+          icon: Icons.check_circle_outline_rounded,
           isLoading: _isBooking,
           onPressed: (_isBooking || !isOnline) ? null : _confirmBooking,
         ),
@@ -532,12 +530,13 @@ class _EmptyHint extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.disabled.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.outlineVariant, width: 0.8),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: AppColors.disabled),
+          Icon(icon, size: 40, color: AppColors.outline),
           const SizedBox(height: 12),
           Text(message,
               style: AppTextStyles.bodyLarge, textAlign: TextAlign.center),
@@ -559,31 +558,157 @@ class _StepRow extends StatelessWidget {
       tr('step_date_slot'),
       tr('step_confirm'),
     ];
+    // Booking is a real sequence, so the steps are numbered; a finished
+    // step shows a tick, the current one is filled peacock.
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(labels.length, (i) {
-        final isActive = i <= currentStep;
+        final isDone = i < currentStep;
+        final isCurrent = i == currentStep;
+        final reached = isDone || isCurrent;
         return Expanded(
           child: Column(
             children: [
-              Container(
-                height: 4,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary : AppColors.disabled,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 2,
+                      color: i == 0
+                          ? Colors.transparent
+                          : (reached
+                              ? AppColors.primary
+                              : AppColors.outlineVariant),
+                    ),
+                  ),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCurrent
+                          ? AppColors.primary
+                          : (isDone
+                              ? AppColors.primaryFixed
+                              : AppColors.surfaceContainerLowest),
+                      border: Border.all(
+                        color: isCurrent
+                            ? AppColors.zari
+                            : (isDone
+                                ? AppColors.primary
+                                : AppColors.outlineVariant),
+                        width: isCurrent ? 2 : 1.2,
+                      ),
+                    ),
+                    child: isDone
+                        ? const Icon(Icons.check_rounded,
+                            size: 20, color: AppColors.primary)
+                        : Text(
+                            '${i + 1}',
+                            style: AppTextStyles.titleMedium.copyWith(
+                              color: isCurrent
+                                  ? AppColors.onPrimary
+                                  : AppColors.outline,
+                              height: 1.1,
+                            ),
+                          ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 2,
+                      color: i == labels.length - 1
+                          ? Colors.transparent
+                          : (isDone
+                              ? AppColors.primary
+                              : AppColors.outlineVariant),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 labels[i],
+                textAlign: TextAlign.center,
                 style: AppTextStyles.caption.copyWith(
-                  color: isActive ? AppColors.primary : AppColors.disabled,
+                  color: reached ? AppColors.primary : AppColors.outline,
+                  fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ],
           ),
         );
       }),
+    );
+  }
+}
+
+/// One day in the date strip: a calendar leaf that fills peacock when chosen.
+class _DateOption extends StatelessWidget {
+  const _DateOption({
+    required this.schemaDate,
+    required this.isToday,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String schemaDate;
+  final bool isToday;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final leaf = AppDateUtils.toDateLeaf(schemaDate);
+    final fg = selected ? AppColors.onPrimary : AppColors.onSurface;
+    final sub = selected ? AppColors.onPrimaryContainer : AppColors.onSurfaceVariant;
+
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: selected ? AppColors.primary : AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Container(
+            width: 76,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: selected ? AppColors.zari : AppColors.outlineVariant,
+                width: selected ? 1.5 : 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  isToday ? tr('today') : (leaf?.weekday ?? ''),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.labelMedium.copyWith(color: sub),
+                ),
+                Text(
+                  leaf?.day ?? schemaDate,
+                  style: AppTextStyles.headlineLarge.copyWith(
+                    color: fg,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  leaf?.month ?? '',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: sub,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

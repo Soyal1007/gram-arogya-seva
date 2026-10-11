@@ -41,6 +41,23 @@ class AppDateUtils {
     return _displayDayMonth.format(parsed);
   }
 
+  /// The calendar-leaf parts of a schema date: day `23`, month `Jul`,
+  /// weekday `Thu`. Null if the date does not parse.
+  static ({String day, String month, String weekday})? toDateLeaf(
+      String schemaDate) {
+    final parsed = DateTime.tryParse(schemaDate);
+    if (parsed == null) return null;
+    return (
+      day: _leafDay.format(parsed),
+      month: _leafMonth.format(parsed),
+      weekday: _leafWeekday.format(parsed),
+    );
+  }
+
+  static final DateFormat _leafDay = DateFormat('dd', 'en_US');
+  static final DateFormat _leafMonth = DateFormat('MMM', 'en_US');
+  static final DateFormat _leafWeekday = DateFormat('EEE', 'en_US');
+
   /// Today as a schema date.
   static String todaySchemaDate() => toSchemaDate(DateTime.now());
 

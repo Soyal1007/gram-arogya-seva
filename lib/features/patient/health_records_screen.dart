@@ -4,6 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:gram_aarogya_seva/core/models/appointment_model.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
+import 'package:gram_aarogya_seva/shared/widgets/date_leaf.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
@@ -28,22 +30,9 @@ class HealthRecordsScreen extends ConsumerWidget {
       body: recordsAsync.when(
         data: (records) {
           if (records.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.folder_open_outlined,
-                        size: 64,
-                        color: AppColors.disabled.withValues(alpha: 0.5)),
-                    const SizedBox(height: 16),
-                    Text(tr('no_health_records'),
-                        style: AppTextStyles.bodyLarge,
-                        textAlign: TextAlign.center),
-                  ],
-                ),
-              ),
+            return EmptyState(
+              icon: Icons.folder_open_outlined,
+              message: tr('no_health_records'),
             );
           }
           return ListView.builder(
@@ -58,7 +47,10 @@ class HealthRecordsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(child: Text(tr('error_generic'))),
+        error: (_, __) => EmptyState(
+          icon: Icons.cloud_off_rounded,
+          message: tr('error_generic'),
+        ),
       ),
     );
   }
@@ -76,29 +68,53 @@ class _RecordCard extends ConsumerWidget {
         ref.watch(healthCenterNameProvider(appointment.healthCenterId));
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 14),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppDateUtils.toDisplayDate(appointment.date),
-                style: AppTextStyles.titleLarge),
-            if (appointment.doctorName.isNotEmpty)
-              Text(tr('doctor_name', args: [appointment.doctorName]),
-                  style: AppTextStyles.bodyMedium),
-            if (centerName != null)
-              Text(centerName,
-                  style:
-                      AppTextStyles.caption.copyWith(color: AppColors.primary)),
-            const Divider(height: 24),
+            Row(
+              children: [
+                DateLeaf(schemaDate: appointment.date),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (appointment.doctorName.isNotEmpty)
+                        Text(tr('doctor_name', args: [appointment.doctorName]),
+                            style: AppTextStyles.titleLarge),
+                      if (centerName != null)
+                        Text(centerName, style: AppTextStyles.caption),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 28),
+            // The prescription is what the patient comes back to read, so it
+            // sits first and on its own gold-edged panel.
+            if (summary.prescription.isNotEmpty)
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.zariSoft,
+                  borderRadius: BorderRadius.circular(14),
+                  border: const Border(
+                    left: BorderSide(color: AppColors.zari, width: 4),
+                  ),
+                ),
+                child: _Field(
+                  label: tr('prescription_label'),
+                  value: summary.prescription,
+                  icon: Icons.medication_outlined,
+                ),
+              ),
             if (summary.notes.isNotEmpty)
               _Field(label: tr('notes_label'), value: summary.notes),
-            if (summary.prescription.isNotEmpty)
-              _Field(
-                  label: tr('prescription_label'),
-                  value: summary.prescription),
             if (summary.nextSteps.isNotEmpty)
               _Field(label: tr('next_steps_label'), value: summary.nextSteps),
             if (summary.followUpDate != null)
@@ -114,10 +130,11 @@ class _RecordCard extends ConsumerWidget {
 }
 
 class _Field extends StatelessWidget {
-  const _Field({required this.label, required this.value});
+  const _Field({required this.label, required this.value, this.icon});
 
   final String label;
   final String value;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +143,23 @@ class _Field extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: AppTextStyles.caption
-                  .copyWith(fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 20, color: AppColors.zariDeep),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: icon != null
+                      ? AppColors.zariDeep
+                      : AppColors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 2),
           Text(value, style: AppTextStyles.bodyLarge),
         ],

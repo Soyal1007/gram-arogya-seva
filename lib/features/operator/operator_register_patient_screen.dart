@@ -6,6 +6,7 @@ import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/patient_model.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
+import 'package:gram_aarogya_seva/shared/widgets/form_section_title.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
@@ -61,7 +62,7 @@ class _OperatorRegisterPatientScreenState
                     setState(() => _photoBase64 = base64),
               ),
               const SizedBox(height: 24),
-              Text(tr('patient_details'), style: AppTextStyles.headlineSmall),
+              FormSectionTitle(tr('patient_details')),
               const SizedBox(height: 16),
 
               TextFormField(

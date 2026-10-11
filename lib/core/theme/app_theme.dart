@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
-/// Material 3 theme aligned with "UBA GramArogya UI" design system.
+/// Material 3 theme — "Paithani".
 /// Key design rules:
-///  - No 1px borders — use tonal layering
-///  - Ambient shadows tinted with brand green, not grey
+///  - Peacock carries every primary action; zari gold is a thin accent only
+///    (app bar edge, focus ring, one highlight per screen)
+///  - Depth from tonal surfaces plus one hairline outline — no grey shadows
 ///  - 56dp+ tap targets, 18sp min body text
-///  - Surface hierarchy for depth, not drop shadows
+///  - Radius encodes hierarchy: 24 hero / sheets, 18 cards, 14 controls
 class AppTheme {
   AppTheme._();
 
+  static const double radiusHero = 24;
+  static const double radiusCard = 18;
+  static const double radiusControl = 14;
+
   static ThemeData get lightTheme {
+    final controlShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(radiusControl),
+    );
+
     return ThemeData(
       useMaterial3: true,
+      fontFamily: AppTextStyles.sans,
 
       // ── Color Scheme (full M3 tonal palette)
       colorScheme: const ColorScheme.light(
@@ -37,6 +46,11 @@ class AppTheme {
         surface: AppColors.surface,
         onSurface: AppColors.onSurface,
         onSurfaceVariant: AppColors.onSurfaceVariant,
+        surfaceContainerLowest: AppColors.surfaceContainerLowest,
+        surfaceContainerLow: AppColors.surfaceContainerLow,
+        surfaceContainer: AppColors.surfaceContainer,
+        surfaceContainerHigh: AppColors.surfaceContainerHigh,
+        surfaceContainerHighest: AppColors.surfaceContainerHighest,
         outline: AppColors.outline,
         outlineVariant: AppColors.outlineVariant,
         inverseSurface: AppColors.inverseSurface,
@@ -44,93 +58,127 @@ class AppTheme {
         inversePrimary: AppColors.inversePrimary,
         surfaceTint: AppColors.surfaceTint,
       ),
-      scaffoldBackgroundColor: AppColors.surfaceContainerLow,
+      scaffoldBackgroundColor: AppColors.surface,
+      splashFactory: InkSparkle.splashFactory,
 
-      // ── AppBar — Healing Gradient feel
-      appBarTheme: AppBarTheme(
+      // ── AppBar — peacock with a zari edge
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.onPrimary,
         elevation: 0,
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: 20,
+        toolbarHeight: 64,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.publicSans(
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
+        shape: Border(
+          bottom: BorderSide(color: AppColors.zari, width: 2),
+        ),
+        iconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
+        actionsIconTheme: IconThemeData(color: AppColors.onPrimary, size: 26),
+        titleTextStyle: TextStyle(
+          fontFamily: AppTextStyles.serif,
+          fontSize: 24,
+          fontWeight: FontWeight.w400,
           color: AppColors.onPrimary,
         ),
       ),
 
-      // ── Cards — No borders, tonal layering (Design System §5)
+      // ── Cards — white on porcelain, one hairline outline
       cardTheme: CardThemeData(
         elevation: 0,
         color: AppColors.surfaceContainerLowest,
         surfaceTintColor: Colors.transparent,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusCard),
+          side: const BorderSide(color: AppColors.outlineVariant, width: 0.8),
         ),
       ),
 
-      // ── ElevatedButton — 60dp, gradient-ready, fully rounded
+      // ── ElevatedButton — solid peacock, 60dp
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.onPrimary,
-          disabledBackgroundColor: AppColors.outlineVariant,
+          disabledBackgroundColor: AppColors.surfaceContainerHigh,
+          disabledForegroundColor: AppColors.outline,
           minimumSize: const Size(double.infinity, 60),
           elevation: 0,
           textStyle: AppTextStyles.labelLarge,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          shape: controlShape,
         ),
       ),
 
-      // ── OutlinedButton — Ghost border style
+      // ── FilledButton — same as Elevated
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          minimumSize: const Size(64, 56),
+          textStyle: AppTextStyles.labelLarge,
+          shape: controlShape,
+        ),
+      ),
+
+      // ── OutlinedButton — peacock hairline
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           minimumSize: const Size(double.infinity, 60),
           textStyle: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
-          side: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.4),
-            width: 1.5,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          side: const BorderSide(color: AppColors.primary, width: 1.2),
+          shape: controlShape,
         ),
       ),
 
-      // ── TextField — Recessed look with surfaceContainerHigh bg
+      // ── TextButton
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          minimumSize: const Size(48, 48),
+          textStyle: AppTextStyles.titleMedium,
+          shape: controlShape,
+        ),
+      ),
+
+      // ── IconButton — 48dp minimum
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
+
+      // ── TextField — white field, hairline, peacock focus with zari ring feel
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceContainerHigh,
+        fillColor: AppColors.surfaceContainerLowest,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(radiusControl),
+          borderSide: const BorderSide(color: AppColors.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(radiusControl),
+          borderSide: const BorderSide(color: AppColors.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          borderRadius: BorderRadius.circular(radiusControl),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.error,
-            width: 1.5,
-          ),
+          borderRadius: BorderRadius.circular(radiusControl),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusControl),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         labelStyle: AppTextStyles.bodyMedium,
+        floatingLabelStyle:
+            AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
         hintStyle: AppTextStyles.caption,
+        prefixIconColor: AppColors.outline,
+        suffixIconColor: AppColors.outline,
       ),
 
       // ── Text Theme
@@ -148,19 +196,33 @@ class AppTheme {
         labelMedium: AppTextStyles.labelMedium,
       ),
 
-      // ── Divider — Ghost borders only (Design System §2 No-Line Rule)
-      dividerTheme: DividerThemeData(
-        color: AppColors.outlineVariant.withValues(alpha: 0.15),
-        thickness: 1,
+      // ── Divider — hairline
+      dividerTheme: const DividerThemeData(
+        color: AppColors.outlineVariant,
+        thickness: 0.8,
         space: 32,
+      ),
+
+      // ── ListTile
+      listTileTheme: ListTileThemeData(
+        iconColor: AppColors.primary,
+        textColor: AppColors.onSurface,
+        titleTextStyle: AppTextStyles.titleMedium,
+        subtitleTextStyle: AppTextStyles.caption,
+        minVerticalPadding: 12,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusControl),
+        ),
       ),
 
       // ── SnackBar
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.inverseSurface,
+        actionTextColor: AppColors.zariBright,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusControl),
         ),
         contentTextStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.inverseOnSurface,
@@ -171,8 +233,9 @@ class AppTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceContainerLowest,
         surfaceTintColor: Colors.transparent,
+        showDragHandle: false,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusHero)),
         ),
       ),
 
@@ -180,39 +243,109 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceContainerLowest,
         surfaceTintColor: Colors.transparent,
+        titleTextStyle: AppTextStyles.headlineMedium,
+        contentTextStyle: AppTextStyles.bodyMedium,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(radiusHero),
         ),
       ),
 
       // ── FloatingActionButton
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: AppColors.onPrimaryContainer,
-        elevation: 0,
-        shape: CircleBorder(),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        elevation: 2,
+        highlightElevation: 4,
+        extendedTextStyle: AppTextStyles.labelLarge,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusCard),
+        ),
       ),
 
       // ── Chip (Language selector, filters)
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surfaceContainerHigh,
+        backgroundColor: AppColors.surfaceContainerLowest,
         selectedColor: AppColors.primary,
-        labelStyle: AppTextStyles.labelMedium,
-        side: BorderSide.none,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+        secondarySelectedColor: AppColors.primary,
+        checkmarkColor: AppColors.onPrimary,
+        labelStyle: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.onSurface,
         ),
+        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.onPrimary,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        side: const BorderSide(color: AppColors.outlineVariant),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusControl),
+        ),
+      ),
+
+      // ── TabBar — zari underline
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.onPrimary,
+        unselectedLabelColor: AppColors.onPrimaryContainer,
+        indicatorColor: AppColors.zariBright,
+        indicatorSize: TabBarIndicatorSize.label,
+        dividerColor: Colors.transparent,
+        labelStyle: AppTextStyles.titleMedium,
+        unselectedLabelStyle:
+            AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w500),
+      ),
+
+      // ── NavigationBar
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surfaceContainerLowest,
+        indicatorColor: AppColors.primaryFixed,
+        surfaceTintColor: Colors.transparent,
+        height: 72,
+        labelTextStyle: WidgetStatePropertyAll(AppTextStyles.labelMedium),
+      ),
+
+      // ── Selection controls
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected) ? AppColors.primary : null),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected)
+                ? AppColors.primary
+                : AppColors.outline),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected) ? AppColors.onPrimary : null),
+        trackColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected) ? AppColors.primary : null),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
+        linearTrackColor: AppColors.surfaceContainerHigh,
       ),
 
       // ── DropdownMenu
       dropdownMenuTheme: DropdownMenuThemeData(
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: AppColors.surfaceContainerHigh,
+          fillColor: AppColors.surfaceContainerLowest,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(radiusControl),
+            borderSide: const BorderSide(color: AppColors.outlineVariant),
           ),
+        ),
+      ),
+
+      // ── Date picker (booking flow)
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: AppColors.surfaceContainerLowest,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: AppColors.primary,
+        headerForegroundColor: AppColors.onPrimary,
+        todayBorder: const BorderSide(color: AppColors.zari, width: 1.5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusHero),
         ),
       ),
     );

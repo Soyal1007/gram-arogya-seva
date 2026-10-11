@@ -23,10 +23,10 @@ class StatusBadge extends StatelessWidget {
     final statusIcon = _statusIcon(status);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +40,8 @@ class StatusBadge extends StatelessWidget {
             style: AppTextStyles.caption.copyWith(
               color: fgColor,
               fontWeight: FontWeight.w600,
-              fontSize: 14,
+              fontSize: 15,
+              height: 1.2,
             ),
           ),
         ],

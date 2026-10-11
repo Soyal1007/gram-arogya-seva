@@ -10,6 +10,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
@@ -60,7 +61,7 @@ class OperatorAppointmentsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(child: Text(tr('error_generic'))),
+        error: (_, __) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
   }
@@ -96,7 +97,6 @@ class _AssistedAppointmentCardState
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

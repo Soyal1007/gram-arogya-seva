@@ -86,15 +86,37 @@ class _AvailabilityManagementScreenState
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                todayDecoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  shape: BoxShape.circle,
+                selectedTextStyle: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.onPrimary,
                 ),
+                todayDecoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.zari, width: 1.5),
+                ),
+                todayTextStyle: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.primary,
+                ),
+                defaultTextStyle: AppTextStyles.bodyLarge,
+                weekendTextStyle: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                disabledTextStyle: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.outlineVariant,
+                ),
+                outsideDaysVisible: false,
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: AppTextStyles.labelMedium,
+                weekendStyle: AppTextStyles.labelMedium,
               ),
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
-                titleTextStyle: AppTextStyles.titleLarge,
+                titleTextStyle: AppTextStyles.headlineMedium,
+                leftChevronIcon: const Icon(Icons.chevron_left_rounded,
+                    color: AppColors.primary, size: 28),
+                rightChevronIcon: const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.primary, size: 28),
               ),
             ),
             const SizedBox(height: 20),
@@ -145,7 +167,7 @@ class _AvailabilityManagementScreenState
                 return Text(
                   tr('slots_configured',
                       args: ['${availability.slots.length}']),
-                  style: AppTextStyles.bodyMedium
+                  style: AppTextStyles.titleMedium
                       .copyWith(color: AppColors.success),
                 );
               },
@@ -168,10 +190,14 @@ class _AvailabilityManagementScreenState
                     .any((s) => s.isBooked);
 
                 return ChoiceChip(
+                  showCheckmark: false,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
                   label: Text(
-                    time,
+                    AppDateUtils.formatSlotForDisplay(time),
                     style: TextStyle(
-                      fontSize: 16,
+                      fontFamily: AppTextStyles.sans,
+                      fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: isBooked
                           ? AppColors.error
@@ -327,13 +353,13 @@ class _HealthCentreDropdown extends ConsumerWidget {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.1),
+              color: AppColors.zariSoft,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber),
+              border: Border.all(color: AppColors.zari),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                const Icon(Icons.info_outline_rounded, color: AppColors.zariDeep, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

@@ -6,6 +6,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/doctor_model.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
@@ -23,9 +24,7 @@ class ManageDoctorsScreen extends ConsumerWidget {
       body: doctorsAsync.when(
         data: (doctors) {
           if (doctors.isEmpty) {
-            return Center(
-              child: Text(tr('no_results'), style: AppTextStyles.titleLarge),
-            );
+            return EmptyState(icon: Icons.search_off_rounded, message: tr('no_results'));
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -34,8 +33,6 @@ class ManageDoctorsScreen extends ConsumerWidget {
               final doc = doctors[i];
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -116,7 +113,7 @@ class ManageDoctorsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(tr('error_generic'))),
+        error: (e, _) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
   }

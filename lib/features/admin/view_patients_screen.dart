@@ -5,6 +5,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
 
@@ -64,10 +65,7 @@ class ViewPatientsScreen extends ConsumerWidget {
                 : resultsAsync.when(
                     data: (patients) {
                       if (patients.isEmpty) {
-                        return Center(
-                          child: Text(tr('no_results'),
-                              style: AppTextStyles.titleLarge),
-                        );
+                        return EmptyState(icon: Icons.search_off_rounded, message: tr('no_results'));
                       }
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -82,8 +80,6 @@ class ViewPatientsScreen extends ConsumerWidget {
                           final p = patients[i];
                           return Card(
                             margin: const EdgeInsets.only(bottom: 8),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(16),
                               leading: CircleAvatar(
@@ -123,7 +119,7 @@ class ViewPatientsScreen extends ConsumerWidget {
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (e, _) =>
-                        Center(child: Text(tr('error_generic'))),
+                        EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
                   ),
           ),
         ],

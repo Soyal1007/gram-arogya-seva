@@ -7,6 +7,7 @@ import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/patient_model.dart';
 import 'package:gram_aarogya_seva/core/models/user_model.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
+import 'package:gram_aarogya_seva/shared/widgets/form_section_title.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
@@ -111,14 +112,14 @@ class _PatientProfileScreenState
               const SizedBox(height: 24),
 
               // Name
-              Text(tr('personal_details'), style: AppTextStyles.headlineSmall),
+              FormSectionTitle(tr('personal_details')),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameCtrl,
                 style: AppTextStyles.bodyLarge,
                 decoration: InputDecoration(
                   labelText: tr('full_name'),
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person_outlined),
                 ),
                 validator: (v) => Validators.validateRequired(v, 'Name'),
               ),
@@ -131,7 +132,7 @@ class _PatientProfileScreenState
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: tr('dob_label'),
-                  prefixIcon: const Icon(Icons.cake),
+                  prefixIcon: const Icon(Icons.cake_outlined),
                   hintText: 'YYYY-MM-DD',
                 ),
                 onTap: () async {
@@ -155,7 +156,7 @@ class _PatientProfileScreenState
                 initialValue: _gender,
                 decoration: InputDecoration(
                   labelText: tr('gender_label'),
-                  prefixIcon: const Icon(Icons.wc),
+                  prefixIcon: const Icon(Icons.wc_outlined),
                 ),
                 items: AppConstants.genders
                     .map((g) => DropdownMenuItem(
@@ -176,7 +177,7 @@ class _PatientProfileScreenState
                 decoration: InputDecoration(
                   labelText: tr('mobile_label'),
                   prefixText: '+91 ',
-                  prefixIcon: const Icon(Icons.phone),
+                  prefixIcon: const Icon(Icons.phone_outlined),
                   counterText: '',
                 ),
                 validator: Validators.validateOptionalPhone,
@@ -193,7 +194,7 @@ class _PatientProfileScreenState
                       : null,
                   decoration: InputDecoration(
                     labelText: tr('village_label'),
-                    prefixIcon: const Icon(Icons.location_on),
+                    prefixIcon: const Icon(Icons.location_on_outlined),
                   ),
                   items: villages
                       .map((v) => DropdownMenuItem(
@@ -208,7 +209,7 @@ class _PatientProfileScreenState
               const SizedBox(height: 24),
 
               // Emergency Contact
-              Text(tr('emergency_contact'), style: AppTextStyles.headlineSmall),
+              FormSectionTitle(tr('emergency_contact')),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _emergNameCtrl,
@@ -235,7 +236,7 @@ class _PatientProfileScreenState
               const SizedBox(height: 24),
 
               // Medical Background
-              Text(tr('medical_background'), style: AppTextStyles.headlineSmall),
+              FormSectionTitle(tr('medical_background')),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _allergiesCtrl,
@@ -243,7 +244,7 @@ class _PatientProfileScreenState
                 style: AppTextStyles.bodyLarge,
                 decoration: InputDecoration(
                   labelText: tr('allergies_label'),
-                  prefixIcon: const Icon(Icons.warning_amber),
+                  prefixIcon: const Icon(Icons.warning_amber_outlined),
                 ),
               ),
               const SizedBox(height: 12),
@@ -253,7 +254,7 @@ class _PatientProfileScreenState
                 style: AppTextStyles.bodyLarge,
                 decoration: InputDecoration(
                   labelText: tr('conditions_label'),
-                  prefixIcon: const Icon(Icons.medical_information),
+                  prefixIcon: const Icon(Icons.medical_information_outlined),
                 ),
               ),
               const SizedBox(height: 32),

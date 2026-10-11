@@ -31,137 +31,123 @@ class EmergencyHelplineSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+      decoration: const BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        // Kumkum edge marks this as the urgent sheet.
+        border: Border(top: BorderSide(color: AppColors.error, width: 3)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.outlineVariant,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFEBEE),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.emergency_rounded, color: Color(0xFFD32F2F), size: 28),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr('emergency_helpline'),
-                      style: AppTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      tr('emergency_desc'),
-                      style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
-                    ),
-                  ],
+                  color: AppColors.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // 108 Ambulance Card
-          _buildContactCard(
-            context,
-            icon: Icons.airport_shuttle_rounded,
-            iconColor: const Color(0xFFD32F2F),
-            backgroundColor: const Color(0xFFFFF5F5),
-            title: tr('emergency_ambulance'),
-            number: '108',
-            subtitle: context.locale.languageCode == 'mr'
-                ? 'मोफत शासकीय रुग्णवाहिका सेवा (२४ तास)'
-                : context.locale.languageCode == 'hi'
-                    ? 'निःशुल्क सरकारी एम्बुलेंस सेवा (24 घंटे)'
-                    : 'Free Government Ambulance Service (24x7)',
-          ),
-          const SizedBox(height: 12),
-
-          // 104 Health Helpline Card
-          _buildContactCard(
-            context,
-            icon: Icons.phone_in_talk_rounded,
-            iconColor: const Color(0xFF1976D2),
-            backgroundColor: const Color(0xFFF0F7FF),
-            title: tr('emergency_health_call'),
-            number: '104',
-            subtitle: context.locale.languageCode == 'mr'
-                ? 'तज्ञ डॉक्टरांचा आरोग्य व वैद्यकीय सल्ला'
-                : context.locale.languageCode == 'hi'
-                    ? 'चिकित्सा व स्वास्थ्य संबंधी निःशुल्क सलाह'
-                    : 'Free medical and health guidance helpline',
-          ),
-          const SizedBox(height: 12),
-
-          // ASHA Worker Support
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
             ),
-            child: Row(
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.volunteer_activism_rounded, color: AppColors.primary, size: 24),
-                ),
-                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        tr('asha_worker_support'),
-                        style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                        tr('emergency_helpline'),
+                        style: AppTextStyles.headlineMedium,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
-                        tr('asha_support_desc'),
-                        style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
+                        tr('emergency_desc'),
+                        style: AppTextStyles.caption,
                       ),
                     ],
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: tr('cancel'),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+
+            // 108 Ambulance — the urgent one, filled kumkum
+            _buildContactCard(
+              context,
+              icon: Icons.airport_shuttle_rounded,
+              accent: AppColors.error,
+              tint: AppColors.errorContainer,
+              title: tr('emergency_ambulance'),
+              number: '108',
+              subtitle: context.locale.languageCode == 'mr'
+                  ? 'मोफत शासकीय रुग्णवाहिका सेवा (२४ तास)'
+                  : context.locale.languageCode == 'hi'
+                      ? 'निःशुल्क सरकारी एम्बुलेंस सेवा (24 घंटे)'
+                      : 'Free Government Ambulance Service (24x7)',
+            ),
+            const SizedBox(height: 12),
+
+            // 104 Health Helpline
+            _buildContactCard(
+              context,
+              icon: Icons.phone_in_talk_rounded,
+              accent: AppColors.primary,
+              tint: AppColors.primaryFixed,
+              title: tr('emergency_health_call'),
+              number: '104',
+              subtitle: context.locale.languageCode == 'mr'
+                  ? 'तज्ञ डॉक्टरांचा आरोग्य व वैद्यकीय सल्ला'
+                  : context.locale.languageCode == 'hi'
+                      ? 'चिकित्सा व स्वास्थ्य संबंधी निःशुल्क सलाह'
+                      : 'Free medical and health guidance helpline',
+            ),
+            const SizedBox(height: 12),
+
+            // ASHA Worker Support
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.zariSoft,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.volunteer_activism_rounded,
+                      color: AppColors.zariDeep, size: 28),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tr('asha_worker_support'),
+                          style: AppTextStyles.titleMedium,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          tr('asha_support_desc'),
+                          style: AppTextStyles.caption,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -169,60 +155,57 @@ class EmergencyHelplineSheet extends StatelessWidget {
   Widget _buildContactCard(
     BuildContext context, {
     required IconData icon,
-    required Color iconColor,
-    required Color backgroundColor,
+    required Color accent,
+    required Color tint,
     required String title,
     required String number,
     required String subtitle,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: iconColor.withValues(alpha: 0.2)),
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+              color: tint,
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: iconColor, size: 26),
+            child: Icon(icon, color: accent, size: 26),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: AppTextStyles.titleLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.onSurface,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
-                ),
+                Text(title, style: AppTextStyles.titleLarge),
+                Text(subtitle, style: AppTextStyles.caption),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           ElevatedButton.icon(
             onPressed: () => _copyNumber(context, number, title),
             style: ElevatedButton.styleFrom(
-              backgroundColor: iconColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: accent,
+              foregroundColor: AppColors.onPrimary,
+              minimumSize: const Size(88, 52),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
             ),
-            icon: const Icon(Icons.call, size: 18),
+            icon: const Icon(Icons.call_rounded, size: 20),
             label: Text(
               number,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                fontFamily: AppTextStyles.sans,
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+              ),
             ),
           ),
         ],

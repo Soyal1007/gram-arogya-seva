@@ -6,6 +6,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
@@ -56,10 +57,7 @@ class MonitorAppointmentsScreen extends ConsumerWidget {
             child: appointmentsAsync.when(
               data: (appointments) {
                 if (appointments.isEmpty) {
-                  return Center(
-                    child: Text(tr('no_results'),
-                        style: AppTextStyles.titleLarge),
-                  );
+                  return EmptyState(icon: Icons.search_off_rounded, message: tr('no_results'));
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -74,8 +72,6 @@ class MonitorAppointmentsScreen extends ConsumerWidget {
                     final apt = appointments[i];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Column(
@@ -121,7 +117,7 @@ class MonitorAppointmentsScreen extends ConsumerWidget {
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
               error: (e, _) =>
-                  Center(child: Text(tr('error_generic'))),
+                  EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
             ),
           ),
         ],
@@ -145,6 +141,7 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChoiceChip(
+      showCheckmark: false,
       label: Text(label,
           style: TextStyle(
             fontSize: 16,

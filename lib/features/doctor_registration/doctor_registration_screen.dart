@@ -8,6 +8,7 @@ import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/core/utils/crypto_utils.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/village_model.dart';
+import 'package:gram_aarogya_seva/shared/widgets/form_section_title.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/profile_photo_picker.dart';
 import 'package:gram_aarogya_seva/features/doctor_registration/doctor_reg_notifier.dart';
@@ -118,7 +119,7 @@ class _DoctorRegistrationScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('step1_basic_info'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('step1_basic_info')),
         const SizedBox(height: 20),
         ProfilePhotoPicker(
           initialPhotoBase64: _photoBase64,
@@ -184,7 +185,7 @@ class _DoctorRegistrationScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('step2_gov_ids'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('step2_gov_ids')),
         const SizedBox(height: 24),
         TextFormField(
           controller: _nmrController,
@@ -245,11 +246,11 @@ class _DoctorRegistrationScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('step3_villages'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('step3_villages')),
         const SizedBox(height: 8),
         Text(
           tr('village_select_hint'),
-          style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[700]),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurfaceVariant),
         ),
         const SizedBox(height: 16),
         villagesAsync.when(
@@ -298,7 +299,7 @@ class _DoctorRegistrationScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('step4_aadhaar'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('step4_aadhaar')),
         const SizedBox(height: 16),
 
         // Masked Aadhaar display
@@ -330,14 +331,14 @@ class _DoctorRegistrationScreenState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.1),
+              color: AppColors.zariSoft,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber),
+              border: Border.all(color: AppColors.zari),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                const Icon(Icons.info_outline_rounded, color: AppColors.zariDeep, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

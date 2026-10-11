@@ -132,7 +132,7 @@ class _OperatorAvailabilityScreenState
                                 ? tr('today')
                                 : AppDateUtils.toShortDisplayDate(dayStr),
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 15,
                               color: isSelected
                                   ? AppColors.onPrimary
                                   : AppColors.onSurface,
@@ -318,13 +318,13 @@ class _HealthCentrePicker extends ConsumerWidget {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.1),
+              color: AppColors.zariSoft,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber),
+              border: Border.all(color: AppColors.zari),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                const Icon(Icons.info_outline_rounded, color: AppColors.zariDeep, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(tr('no_health_centers'),

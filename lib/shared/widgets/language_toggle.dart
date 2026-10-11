@@ -20,9 +20,10 @@ class LanguageToggle extends ConsumerWidget {
         await context.setLocale(locale);
         ref.read(appLocaleProvider.notifier).state = locale;
       },
-      offset: const Offset(0, 48),
+      offset: const Offset(0, 52),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.outlineVariant),
       ),
       color: AppColors.surfaceContainerLowest,
       itemBuilder: (_) => [
@@ -31,10 +32,14 @@ class LanguageToggle extends ConsumerWidget {
         _buildItem(const Locale('hi'), 'हिंदी', currentLocale),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        constraints: const BoxConstraints(minHeight: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.onPrimary.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(20),
+          color: AppColors.onPrimary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.zariBright.withValues(alpha: 0.7),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -44,14 +49,14 @@ class LanguageToggle extends ConsumerWidget {
               style: AppTextStyles.labelMedium.copyWith(
                 color: AppColors.onPrimary,
                 fontWeight: FontWeight.w600,
-                fontSize: 13,
+                fontSize: 15,
               ),
             ),
             const SizedBox(width: 4),
-            Icon(
+            const Icon(
               Icons.expand_more_rounded,
               size: 18,
-              color: AppColors.onPrimary.withValues(alpha: 0.8),
+              color: AppColors.zariBright,
             ),
           ],
         ),

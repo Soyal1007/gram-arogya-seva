@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:gram_aarogya_seva/core/models/notification_model.dart';
@@ -70,7 +71,7 @@ class NotificationsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(child: Text(tr('error_generic'))),
+        error: (_, __) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
   }
@@ -87,10 +88,15 @@ class _NotificationTile extends ConsumerWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
-      color: isUnread
-          ? AppColors.primary.withValues(alpha: 0.06)
-          : AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: AppColors.surfaceContainerLowest,
+      // Unread: a gold edge, the same signal the app uses for "needs you".
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: isUnread ? AppColors.zari : AppColors.outlineVariant,
+          width: isUnread ? 1.4 : 0.8,
+        ),
+      ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
@@ -121,7 +127,7 @@ class _NotificationTile extends ConsumerWidget {
           ],
         ),
         trailing: isUnread
-            ? const Icon(Icons.circle, size: 10, color: AppColors.primary)
+            ? const Icon(Icons.circle, size: 12, color: AppColors.zari)
             : null,
         onTap: isUnread
             ? () => ref

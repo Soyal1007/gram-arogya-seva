@@ -1,69 +1,84 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens extracted from "UBA GramArogya UI" Stitch project.
-/// Palette: "Deep Healing Green" — high-contrast for rural outdoor readability.
+/// Design tokens — "Paithani".
+///
+/// Drawn from Maharashtra's Paithani silk: a deep peacock-green body with a
+/// thin zari (gold thread) border. Peacock carries the brand and every primary
+/// action; zari is an accent only — thin rules, focus rings, the one highlight
+/// on a screen — never a fill behind text. Contrast of every text/background
+/// pair used here is ≥ 4.5:1 for outdoor readability (SRS DP-1).
 class AppColors {
   AppColors._();
 
   // ═══════════════════════════════════════════════════
-  // PRIMARY — "Healing Deep Green"
+  // PRIMARY — Peacock
   // ═══════════════════════════════════════════════════
-  static const Color primary = Color(0xFF004628);
-  static const Color primaryContainer = Color(0xFF006039);
+  static const Color primary = Color(0xFF0E4D45);
+  static const Color primaryDeep = Color(0xFF083631);
+  static const Color primaryContainer = Color(0xFF16675C);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color onPrimaryContainer = Color(0xFF88D8A7);
-  static const Color primaryFixed = Color(0xFFA3F4C1);
-  static const Color primaryFixedDim = Color(0xFF88D7A6);
-  static const Color inversePrimary = Color(0xFF88D7A6);
+  static const Color onPrimaryContainer = Color(0xFFCDEAE3);
+  static const Color primaryFixed = Color(0xFFD5ECE6);
+  static const Color primaryFixedDim = Color(0xFFA6D6CB);
+  static const Color inversePrimary = Color(0xFF8FD0C2);
 
   // ═══════════════════════════════════════════════════
-  // SECONDARY
+  // ZARI — gold thread accent. Rules, focus, highlights; never body text
+  // on light surfaces (use zariDeep for that).
   // ═══════════════════════════════════════════════════
-  static const Color secondary = Color(0xFF1B6D24);
-  static const Color secondaryContainer = Color(0xFFA0F399);
+  static const Color zari = Color(0xFFB8912F);
+  static const Color zariBright = Color(0xFFD9B45A);
+  static const Color zariDeep = Color(0xFF7A5E17);
+  static const Color zariSoft = Color(0xFFF6EDD3);
+
+  // ═══════════════════════════════════════════════════
+  // SECONDARY — Leaf green (success / accepted)
+  // ═══════════════════════════════════════════════════
+  static const Color secondary = Color(0xFF2F6B3A);
+  static const Color secondaryContainer = Color(0xFFD6EBD4);
   static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color onSecondaryContainer = Color(0xFF217128);
+  static const Color onSecondaryContainer = Color(0xFF1D4A25);
 
   // ═══════════════════════════════════════════════════
-  // TERTIARY — Warm Ochre / Earth Tone
+  // TERTIARY — Haldi ochre (pending / attention)
   // ═══════════════════════════════════════════════════
-  static const Color tertiary = Color(0xFF751A00);
-  static const Color tertiaryContainer = Color(0xFF9E2600);
+  static const Color tertiary = Color(0xFF7E4510);
+  static const Color tertiaryContainer = Color(0xFF9A5512);
   static const Color onTertiary = Color(0xFFFFFFFF);
-  static const Color onTertiaryContainer = Color(0xFFFFB6A2);
-  static const Color tertiaryFixed = Color(0xFFFFDBD1);
-  static const Color tertiaryFixedDim = Color(0xFFFFB5A1);
+  static const Color onTertiaryContainer = Color(0xFFFFE3C7);
+  static const Color tertiaryFixed = Color(0xFFFBE6CD);
+  static const Color tertiaryFixedDim = Color(0xFFF1CB9C);
 
   // ═══════════════════════════════════════════════════
-  // SURFACE HIERARCHY (Tonal Layering)
+  // SURFACE HIERARCHY — Porcelain (cool, slightly green-tinted)
   // ═══════════════════════════════════════════════════
-  static const Color surface = Color(0xFFF8FAF8);
-  static const Color surfaceDim = Color(0xFFD8DAD9);
-  static const Color surfaceBright = Color(0xFFF8FAF8);
+  static const Color surface = Color(0xFFF5F7F5);
+  static const Color surfaceDim = Color(0xFFD3DAD6);
+  static const Color surfaceBright = Color(0xFFFAFBFA);
   static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLow = Color(0xFFF2F4F2);
-  static const Color surfaceContainer = Color(0xFFECEEEC);
-  static const Color surfaceContainerHigh = Color(0xFFE6E9E7);
-  static const Color surfaceContainerHighest = Color(0xFFE1E3E1);
-  static const Color surfaceTint = Color(0xFF176C43);
-  static const Color inverseSurface = Color(0xFF2E3130);
-  static const Color inverseOnSurface = Color(0xFFEFF1EF);
+  static const Color surfaceContainerLow = Color(0xFFF0F4F2);
+  static const Color surfaceContainer = Color(0xFFE9EEEB);
+  static const Color surfaceContainerHigh = Color(0xFFE2E8E5);
+  static const Color surfaceContainerHighest = Color(0xFFDAE1DD);
+  static const Color surfaceTint = primary;
+  static const Color inverseSurface = Color(0xFF1C2A27);
+  static const Color inverseOnSurface = Color(0xFFEEF3F1);
 
   // ═══════════════════════════════════════════════════
-  // ON-SURFACE
+  // ON-SURFACE — Ink
   // ═══════════════════════════════════════════════════
-  static const Color onSurface = Color(0xFF191C1B);
-  static const Color onSurfaceVariant = Color(0xFF3F4942);
-  static const Color outline = Color(0xFF6F7A71);
-  static const Color outlineVariant = Color(0xFFBFC9BF);
+  static const Color onSurface = Color(0xFF142320);
+  static const Color onSurfaceVariant = Color(0xFF3C4C48);
+  static const Color outline = Color(0xFF66766F);
+  static const Color outlineVariant = Color(0xFFC5D0CB);
 
   // ═══════════════════════════════════════════════════
-  // ERROR
+  // ERROR — Kumkum red (also emergency)
   // ═══════════════════════════════════════════════════
-  static const Color error = Color(0xFFBA1A1A);
-  static const Color errorContainer = Color(0xFFFFDAD6);
+  static const Color error = Color(0xFFB3261E);
+  static const Color errorContainer = Color(0xFFFADBD7);
   static const Color onError = Color(0xFFFFFFFF);
-  static const Color onErrorContainer = Color(0xFF93000A);
+  static const Color onErrorContainer = Color(0xFF7A1410);
 
   // ═══════════════════════════════════════════════════
   // LEGACY ALIASES (backward compatibility)
@@ -73,7 +88,8 @@ class AppColors {
   static const Color disabled = outlineVariant;
   static const Color divider = outlineVariant;
   static const Color success = secondary;
-  static const Color info = Color(0xFF0288D1);
+  static const Color info = Color(0xFF1F5A85);
+  static const Color infoContainer = Color(0xFFDCEAF5);
 
   // ═══════════════════════════════════════════════════
   // STATUS COLOURS (Design System §5 — StatusBadge)
@@ -94,9 +110,9 @@ class AppColors {
   // ═══════════════════════════════════════════════════
   // SEVERITY
   // ═══════════════════════════════════════════════════
-  static const Color severityMild = Color(0xFF88D982);
-  static const Color severityModerate = Color(0xFFFFB5A1);
-  static const Color severitySevere = Color(0xFFBA1A1A);
+  static const Color severityMild = Color(0xFF4E9A5B);
+  static const Color severityModerate = Color(0xFFC98A2E);
+  static const Color severitySevere = error;
 
   /// Returns the foreground colour for a given appointment status string.
   static Color statusColor(String status) {
@@ -146,10 +162,19 @@ class AppColors {
     }
   }
 
-  /// The Healing Gradient — primary → primaryContainer (Design System §2).
+  /// Peacock silk — the header and hero-card fill. Name kept for existing
+  /// call sites.
   static const LinearGradient healingGradient = LinearGradient(
-    colors: [primary, primaryContainer],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
+    colors: [primaryDeep, primary, primaryContainer],
+    stops: [0.0, 0.55, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Zari border — a thin gold rule that marks the edge of a hero surface.
+  static const LinearGradient zariGradient = LinearGradient(
+    colors: [zariDeep, zariBright, zari],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
   );
 }

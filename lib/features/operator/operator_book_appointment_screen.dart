@@ -10,6 +10,7 @@ import 'package:gram_aarogya_seva/core/models/appointment_model.dart';
 import 'package:gram_aarogya_seva/core/models/patient_model.dart';
 import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
+import 'package:gram_aarogya_seva/shared/widgets/form_section_title.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/no_network_banner.dart';
 import 'package:gram_aarogya_seva/core/providers/connectivity_provider.dart';
@@ -86,7 +87,7 @@ class _OperatorBookAppointmentScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('find_patient'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('find_patient')),
         const SizedBox(height: 16),
         TextFormField(
           controller: _mobileCtrl,
@@ -193,7 +194,7 @@ class _OperatorBookAppointmentScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('select_doctor'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('select_doctor')),
         const SizedBox(height: 12),
         doctorsAsync.when(
           data: (doctors) {
@@ -204,8 +205,6 @@ class _OperatorBookAppointmentScreenState
               children: doctors.map((doc) {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: CircleAvatar(
@@ -374,7 +373,7 @@ class _OperatorBookAppointmentScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(tr('appointment_details'), style: AppTextStyles.headlineSmall),
+        FormSectionTitle(tr('appointment_details')),
         const SizedBox(height: 16),
 
         // Summary
@@ -531,7 +530,7 @@ class _StepRow extends StatelessWidget {
               Text(labels[i],
                   style: AppTextStyles.caption.copyWith(
                     color: isActive ? AppColors.primary : AppColors.disabled,
-                    fontSize: 12,
+                    fontSize: 15,
                   )),
             ],
           ),

@@ -7,6 +7,7 @@ import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/user_model.dart';
+import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/features/auth/auth_notifier.dart';
 
@@ -88,7 +89,7 @@ class _OtpVerificationScreenState
       appBar: AppBar(
         title: Text(tr('verify')),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
             ref.read(authNotifierProvider.notifier).reset();
             Navigator.of(context).pop();
@@ -101,33 +102,36 @@ class _OtpVerificationScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24),
-
-              // Icon
-              Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.sms_rounded,
-                    size: 40,
-                    color: AppColors.secondary,
-                  ),
+              const SizedBox(height: 8),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryFixed,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.sms_outlined,
+                  size: 30,
+                  color: AppColors.primary,
                 ),
               ),
-              const SizedBox(height: 24),
-
-              Center(
-                child: Text(
-                  tr('enter_otp'),
-                  style: AppTextStyles.headlineSmall,
-                ),
+              const SizedBox(height: 20),
+              Text(
+                tr('enter_otp'),
+                style: AppTextStyles.headlineLarge,
               ),
-              const SizedBox(height: 32),
+              if (ref.watch(phoneNumberProvider).isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '+91 ${ref.watch(phoneNumberProvider)}',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 28),
 
               // OTP input
               Form(
@@ -137,19 +141,22 @@ class _OtpVerificationScreenState
                   keyboardType: TextInputType.number,
                   maxLength: 6,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    letterSpacing: 12,
+                  autofillHints: const [AutofillHints.oneTimeCode],
+                  style: AppTextStyles.displayMedium.copyWith(
+                    fontFamily: AppTextStyles.sans,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 14,
+                    color: AppColors.primary,
                   ),
                   decoration: InputDecoration(
                     counterText: '',
-                    hintText: '------',
-                    hintStyle: AppTextStyles.headlineMedium.copyWith(
-                      letterSpacing: 12,
-                      color: AppColors.disabled,
+                    hintText: '······',
+                    hintStyle: AppTextStyles.displayMedium.copyWith(
+                      fontFamily: AppTextStyles.sans,
+                      letterSpacing: 14,
+                      color: AppColors.outlineVariant,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   validator: Validators.validateOtp,
                 ),
@@ -173,16 +180,15 @@ class _OtpVerificationScreenState
                     ? Text(
                         '${tr('resend_otp')} (${_resendCountdown}s)',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.disabled,
+                          color: AppColors.outline,
                         ),
                       )
                     : TextButton(
                         onPressed: _onResend,
                         child: Text(
                           tr('resend_otp'),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.w600,
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -192,28 +198,7 @@ class _OtpVerificationScreenState
               if (authState.status == AuthStatus.error &&
                   authState.errorKey != null) ...[
                 const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline, color: AppColors.error),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          tr(authState.errorKey!),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                InlineError(message: tr(authState.errorKey!)),
               ],
             ],
           ),

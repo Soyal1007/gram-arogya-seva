@@ -27,7 +27,6 @@ dependencies:
   # UI & UX
   easy_localization: ^3.0.7+1
   table_calendar: ^3.2.0
-  google_fonts: ^6.2.1
   image_picker: ^1.1.2
 
   # Utilities
@@ -39,6 +38,7 @@ dependencies:
   firebase_app_check: ^0.3.2+10
   firebase_remote_config: ^5.5.0
   flutter_tts: ^4.2.5
+  audioplayers: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -57,3 +57,19 @@ flutter:
     - assets/l10n/
     - assets/icons/
     - assets/images/
+
+  # Bundled, not fetched at runtime: target users are on slow networks, and
+  # both families cover Devanagari so mr/hi render in the designed type.
+  fonts:
+    - family: Mukta
+      fonts:
+        - asset: assets/fonts/Mukta-Regular.ttf
+        - asset: assets/fonts/Mukta-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Mukta-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Mukta-Bold.ttf
+          weight: 700
+    - family: TiroDevanagariMarathi
+      fonts:
+        - asset: assets/fonts/TiroDevanagariMarathi-Regular.ttf

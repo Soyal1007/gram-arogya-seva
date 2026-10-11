@@ -16,12 +16,12 @@ class NoNetworkBanner extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.wifi_off, color: Colors.white, size: 20),
+          const Icon(Icons.wifi_off_rounded, color: AppColors.onError, size: 20),
           const SizedBox(width: 8),
           Text(
             tr('error_no_network'),
             style: AppTextStyles.caption.copyWith(
-              color: Colors.white,
+              color: AppColors.onError,
               fontWeight: FontWeight.w600,
             ),
           ),

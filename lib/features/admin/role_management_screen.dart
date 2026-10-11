@@ -5,6 +5,7 @@ import 'package:gram_aarogya_seva/core/config/app_constants.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
 
@@ -65,10 +66,7 @@ class RoleManagementScreen extends ConsumerWidget {
                 : resultsAsync.when(
                     data: (users) {
                       if (users.isEmpty) {
-                        return Center(
-                          child: Text(tr('no_results'),
-                              style: AppTextStyles.titleLarge),
-                        );
+                        return EmptyState(icon: Icons.search_off_rounded, message: tr('no_results'));
                       }
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -77,8 +75,6 @@ class RoleManagementScreen extends ConsumerWidget {
                           final user = users[i];
                           return Card(
                             margin: const EdgeInsets.only(bottom: 10),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
@@ -183,7 +179,7 @@ class RoleManagementScreen extends ConsumerWidget {
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (e, _) =>
-                        Center(child: Text(tr('error_generic'))),
+                        EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
                   ),
           ),
         ],

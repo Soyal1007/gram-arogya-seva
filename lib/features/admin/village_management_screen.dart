@@ -6,6 +6,7 @@ import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/models/village_model.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
 import 'package:gram_aarogya_seva/features/admin/admin_providers.dart';
@@ -52,7 +53,7 @@ class VillageManagementScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(tr('error_generic'))),
+        error: (e, _) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
   }

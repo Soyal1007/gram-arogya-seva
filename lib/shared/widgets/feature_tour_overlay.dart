@@ -53,7 +53,7 @@ class TourStepItem {
 }
 
 /// Fullscreen interactive Spotlight Overlay.
-/// Dim the screen, highlights each targeted widget with an animated glowing cutout,
+/// Dims the background, spotlights each targeted widget with an animated glowing cutout and pulse ring,
 /// provides spoken voice explanations in Marathi, Hindi, and English,
 /// and eliminates any pixel overflows with responsive bounds clamping.
 class FeatureTourOverlay extends StatefulWidget {
@@ -144,6 +144,10 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
         curve: Curves.easeInOut,
         alignment: 0.35,
       );
+      // Re-trigger layout measurement after scroll finishes
+      Future.delayed(const Duration(milliseconds: 380), () {
+        if (mounted) setState(() {});
+      });
     }
   }
 
@@ -192,7 +196,6 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
   void _switchLanguage(String code) {
     context.setLocale(Locale(code));
     _ttsService.stop();
-    // Play with new language after microtask
     Future.microtask(() {
       if (mounted) {
         _playCurrentAudio();
@@ -224,12 +227,12 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
     // Fallback if target is offscreen or not rendered yet
     final safeTargetRect = targetRect ??
         Rect.fromCenter(
-          center: Offset(screenSize.width / 2, screenSize.height / 3),
-          width: screenSize.width * 0.85,
+          center: Offset(screenSize.width / 2, screenSize.height * 0.35),
+          width: screenSize.width * 0.88,
           height: 120,
         );
 
-    final isTargetInTopHalf = safeTargetRect.center.dy < screenSize.height * 0.55;
+    final isTargetInTopHalf = safeTargetRect.center.dy < screenSize.height * 0.52;
 
     return PopScope(
       canPop: false,
@@ -243,7 +246,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            // 1. Dark backdrop with cut-out hole over the spotlighted feature
+            // 1. Dark backdrop with illuminated cutout hole over the highlighted feature
             AnimatedBuilder(
               animation: _pulseController,
               builder: (context, _) {
@@ -257,45 +260,105 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
               },
             ),
 
-            // 2. Click outside barrier (dismiss tour safely if tapped outside)
+            // 2. Translucent dismiss / interaction layer
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  // User taps outside: move to next or keep active
+                  // User taps outside card: keep tour active
                 },
               ),
             ),
 
-            // 3. Highlighted Element Ring Accent
+            // 3. Highlighted Element Glowing Outline with Pulse Animation
+            AnimatedBuilder(
+              animation: _pulseController,
+              builder: (context, _) {
+                final pulse = _pulseController.value;
+                return Positioned(
+                  left: max(4.0, safeTargetRect.left),
+                  top: max(4.0, safeTargetRect.top),
+                  width: min(screenSize.width - 8.0, safeTargetRect.width),
+                  height: safeTargetRect.height,
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: AppColors.zariBright,
+                          width: 2.8,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.zariBright.withValues(alpha: 0.35 + (pulse * 0.35)),
+                            blurRadius: 14.0 + (pulse * 8.0),
+                            spreadRadius: 2.0 + (pulse * 3.0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            // 4. Visual Indicator Badge Pointing to the Highlighted Thing
             Positioned(
-              left: max(4.0, safeTargetRect.left),
-              top: max(4.0, safeTargetRect.top),
-              width: min(screenSize.width - 8.0, safeTargetRect.width),
-              height: safeTargetRect.height,
+              left: max(16.0, safeTargetRect.center.dx - 80),
+              top: isTargetInTopHalf
+                  ? max(safeTargetRect.top - 32, 28)
+                  : min(safeTargetRect.bottom + 8, screenSize.height - 40),
               child: IgnorePointer(
                 child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: const Color(0xFF4CAF50),
-                      width: 2.5,
-                    ),
+                    color: AppColors.zariBright,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryDeep.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isTargetInTopHalf ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                        color: AppColors.onSurface,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        currentLang == 'mr'
+                            ? 'हे फिचर पहा'
+                            : currentLang == 'hi'
+                                ? 'यह फीचर देखें'
+                                : 'Look here',
+                        style: const TextStyle(
+                          color: AppColors.onSurface,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
 
-            // 4. Floating Explanation & Audio Card (Positioned responsive to target)
+            // 5. Floating Explanation & Audio Control Card
             Positioned(
               left: 16,
               right: 16,
               top: isTargetInTopHalf
-                  ? min(screenSize.height - 340, safeTargetRect.bottom + 16)
+                  ? min(screenSize.height - 350, max(safeTargetRect.bottom + 16, 80))
                   : null,
               bottom: isTargetInTopHalf
                   ? null
-                  : min(screenSize.height - 340, (screenSize.height - safeTargetRect.top) + 16),
+                  : min(screenSize.height - 350, max((screenSize.height - safeTargetRect.top) + 16, 80)),
               child: _buildTooltipCard(context, currentLang),
             ),
           ],
@@ -310,45 +373,45 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
     final isLast = _currentIndex == widget.steps.length - 1;
 
     return Container(
-      constraints: const BoxConstraints(maxHeight: 330),
+      constraints: const BoxConstraints(maxHeight: 340),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: AppColors.primaryDeep.withValues(alpha: 0.4),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(color: const Color(0xFF81C784), width: 1.5),
+        border: Border.all(color: AppColors.zariBright, width: 1.6),
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Step indicator + Language Pills + Close Button
+            // Top Row: Step indicator + Language Switchers + Close Button
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: AppColors.primaryFixed,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${_currentIndex + 1} / ${widget.steps.length}',
                     style: const TextStyle(
-                      color: Color(0xFF1B5E20),
+                      color: AppColors.primary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      fontSize: 15,
                     ),
                   ),
                 ),
                 const Spacer(),
-                // Language selection pills right on the tour
+                // Language selection pills directly on the tour card
                 _buildLanguageTogglePill('mr', 'मराठी', currentLang == 'mr'),
                 const SizedBox(width: 4),
                 _buildLanguageTogglePill('hi', 'हिंदी', currentLang == 'hi'),
@@ -363,7 +426,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                   borderRadius: BorderRadius.circular(16),
                   child: const Padding(
                     padding: EdgeInsets.all(4),
-                    child: Icon(Icons.close_rounded, size: 22, color: Colors.grey),
+                    child: Icon(Icons.close_rounded, size: 22, color: AppColors.outline),
                   ),
                 ),
               ],
@@ -376,10 +439,10 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE8F5E9),
+                    color: AppColors.primaryFixed,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(_currentStep.icon, color: const Color(0xFF2E7D32), size: 22),
+                  child: Icon(_currentStep.icon, color: AppColors.primaryContainer, size: 22),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -413,17 +476,17 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: _isPlayingAudio ? const Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
+                color: _isPlayingAudio ? AppColors.primaryFixed : AppColors.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _isPlayingAudio ? const Color(0xFFA5D6A7) : Colors.transparent,
+                  color: _isPlayingAudio ? AppColors.primaryFixedDim : Colors.transparent,
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
                     _isPlayingAudio ? Icons.volume_up_rounded : Icons.volume_down_rounded,
-                    color: _isPlayingAudio ? const Color(0xFF2E7D32) : Colors.grey[700],
+                    color: _isPlayingAudio ? AppColors.primaryContainer : AppColors.onSurfaceVariant,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -431,19 +494,19 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                     child: Text(
                       _isPlayingAudio
                           ? (currentLang == 'mr'
-                              ? 'माहिती बोलत आहे...'
+                              ? 'माहिती बोलत आहे... 🔊'
                               : currentLang == 'hi'
-                                  ? 'जानकारी सुनाई जा रही है...'
-                                  : 'Speaking instructions...')
+                                  ? 'जानकारी सुनाई जा रही है... 🔊'
+                                  : 'Speaking instructions... 🔊')
                           : (currentLang == 'mr'
-                              ? 'आवाज ऐका (Audio)'
+                              ? 'आवाज ऐका (Voice Audio)'
                               : currentLang == 'hi'
-                                  ? 'आवाज सुनें (Audio)'
+                                  ? 'आवाज सुनें (Voice Audio)'
                                   : 'Listen to Voice Guide'),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: _isPlayingAudio ? const Color(0xFF1B5E20) : Colors.black87,
+                        color: _isPlayingAudio ? AppColors.primary : AppColors.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -455,10 +518,10 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _isPlayingAudio ? const Color(0xFF2E7D32) : Colors.white,
+                        color: _isPlayingAudio ? AppColors.primaryContainer : Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: _isPlayingAudio ? const Color(0xFF2E7D32) : Colors.grey[400]!,
+                          color: _isPlayingAudio ? AppColors.primaryContainer : AppColors.outline,
                         ),
                       ),
                       child: Text(
@@ -474,9 +537,9 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                                     ? 'सुनें 🔊'
                                     : 'Play 🔊'),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: _isPlayingAudio ? Colors.white : const Color(0xFF2E7D32),
+                          color: _isPlayingAudio ? Colors.white : AppColors.primaryContainer,
                         ),
                       ),
                     ),
@@ -508,7 +571,7 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
                   child: ElevatedButton.icon(
                     onPressed: _nextStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1B5E20),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       minimumSize: const Size(0, 42),
@@ -543,17 +606,17 @@ class _FeatureTourOverlayState extends State<FeatureTourOverlay>
     return GestureDetector(
       onTap: () => _switchLanguage(code),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF2E7D32) : const Color(0xFFF1F8E9),
+          color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : const Color(0xFF2E7D32),
+            color: isSelected ? Colors.white : AppColors.primaryContainer,
           ),
         ),
       ),
@@ -575,11 +638,11 @@ class _SpotlightHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final backgroundPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.76)
+      ..color = AppColors.primaryDeep.withValues(alpha: 0.76)
       ..style = PaintingStyle.fill;
 
     final haloPaint = Paint()
-      ..color = const Color(0xFF66BB6A).withValues(alpha: 0.15 + (pulseFactor * 0.12))
+      ..color = AppColors.zariBright.withValues(alpha: 0.15 + (pulseFactor * 0.15))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6.0 + (pulseFactor * 4.0);
 

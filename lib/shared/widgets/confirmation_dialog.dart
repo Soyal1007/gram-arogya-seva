@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 
 /// Reusable confirmation dialog for destructive or significant actions.
@@ -65,7 +66,8 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title, style: AppTextStyles.headlineSmall),
+      title: Text(title, style: AppTextStyles.headlineMedium),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -82,14 +84,23 @@ class ConfirmationDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(cancelLabel, style: AppTextStyles.bodyLarge),
+          style: TextButton.styleFrom(minimumSize: const Size(96, 52)),
+          child: Text(
+            cancelLabel,
+            style: AppTextStyles.titleMedium.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () {
             if (canConfirm != null && !canConfirm!()) return;
             Navigator.of(context).pop(true);
           },
-          style: ElevatedButton.styleFrom(backgroundColor: confirmColor),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: confirmColor,
+            minimumSize: const Size(120, 52),
+          ),
           child: Text(confirmLabel),
         ),
       ],

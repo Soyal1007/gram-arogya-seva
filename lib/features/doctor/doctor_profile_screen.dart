@@ -8,6 +8,7 @@ import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/core/utils/crypto_utils.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/features/doctor/doctor_providers.dart';
@@ -125,7 +126,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -157,11 +158,11 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.1),
+                        color: AppColors.info.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.photo_library,
-                          color: Colors.blue),
+                          color: AppColors.info),
                     ),
                     title: Text(tr('change_photo')),
                     onTap: () {
@@ -177,15 +178,15 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.1),
+                        color: AppColors.error.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.delete_outline,
-                          color: Colors.red),
+                          color: AppColors.error),
                     ),
                     title: Text(tr('remove_photo')),
                     titleTextStyle:
-                        AppTextStyles.bodyLarge.copyWith(color: Colors.red),
+                        AppTextStyles.bodyLarge.copyWith(color: AppColors.error),
                     onTap: () {
                       Navigator.pop(ctx);
                       setState(() {
@@ -231,7 +232,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
 
     showDialog(
       context: context,
-      barrierColor: Colors.black87,
+      barrierColor: AppColors.primaryDeep.withValues(alpha: 0.92),
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: EdgeInsets.zero,
@@ -260,7 +261,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: AppColors.onSurfaceVariant,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close,
@@ -297,7 +298,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
       body: doctorAsync.when(
         data: (doctor) {
           if (doctor == null) {
-            return Center(child: Text(tr('error_generic')));
+            return EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic'));
           }
 
           // Initialize form controllers once
@@ -579,7 +580,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(tr('error_generic'))),
+        error: (e, _) => EmptyState(icon: Icons.cloud_off_rounded, message: tr('error_generic')),
       ),
     );
   }

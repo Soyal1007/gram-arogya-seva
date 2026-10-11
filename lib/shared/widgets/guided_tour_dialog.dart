@@ -101,7 +101,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: AppColors.primaryDeep.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
@@ -151,7 +151,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontSize: 15,
                   ),
                 ),
               ),
@@ -240,7 +240,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
           ),
@@ -277,7 +277,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           width: 76,
           height: 76,
           decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9),
+            color: AppColors.primaryFixed,
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 2),
           ),
@@ -352,14 +352,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           width: 76,
           height: 76,
           decoration: BoxDecoration(
-            color: const Color(0xFFE0F2F1),
+            color: AppColors.primaryFixed,
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFF00897B).withValues(alpha: 0.2), width: 2),
+            border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.2), width: 2),
           ),
           child: const Icon(
             Icons.calendar_month_rounded,
             size: 40,
-            color: Color(0xFF00897B),
+            color: AppColors.primaryContainer,
           ),
         ),
         const SizedBox(height: 14),
@@ -439,14 +439,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           width: 76,
           height: 76,
           decoration: BoxDecoration(
-            color: const Color(0xFFE1F5FE),
+            color: AppColors.infoContainer,
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFF0288D1).withValues(alpha: 0.2), width: 2),
+            border: Border.all(color: AppColors.info.withValues(alpha: 0.2), width: 2),
           ),
           child: const Icon(
             Icons.receipt_long_rounded,
             size: 40,
-            color: Color(0xFF0288D1),
+            color: AppColors.info,
           ),
         ),
         const SizedBox(height: 14),
@@ -471,9 +471,9 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F8E9),
+            color: AppColors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFC8E6C9)),
+            border: Border.all(color: AppColors.primaryFixedDim),
           ),
           child: Column(
             children: [
@@ -536,14 +536,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
           width: 76,
           height: 76,
           decoration: BoxDecoration(
-            color: const Color(0xFFFFEBEE),
+            color: AppColors.errorContainer,
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFD32F2F).withValues(alpha: 0.2), width: 2),
+            border: Border.all(color: AppColors.error.withValues(alpha: 0.2), width: 2),
           ),
           child: const Icon(
             Icons.support_agent_rounded,
             size: 40,
-            color: Color(0xFFD32F2F),
+            color: AppColors.error,
           ),
         ),
         const SizedBox(height: 14),
@@ -575,14 +575,14 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
             children: [
               _buildHelpRow(
                 icon: Icons.emergency_rounded,
-                iconColor: const Color(0xFFD32F2F),
+                iconColor: AppColors.error,
                 title: tr('emergency_ambulance'),
                 desc: '108 (२४ तास विनामूल्य / 24 Hours Free)',
               ),
               const Divider(height: 14),
               _buildHelpRow(
                 icon: Icons.phone_in_talk_rounded,
-                iconColor: const Color(0xFF1976D2),
+                iconColor: AppColors.info,
                 title: tr('emergency_health_call'),
                 desc: '104 (आरोग्य सल्ला व मार्गदर्शन)',
               ),
@@ -672,7 +672,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: 15,
                   ),
                 ),
               ),
@@ -762,7 +762,7 @@ class _GuidedTourDialogState extends State<GuidedTourDialog> {
               child: Text(
                 _isPlayingAudio ? 'थांबवा / Stop' : 'ऐका / Play',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: _isPlayingAudio ? Colors.white : AppColors.primary,
                 ),

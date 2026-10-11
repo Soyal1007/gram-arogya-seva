@@ -10,6 +10,8 @@ import 'package:gram_aarogya_seva/core/providers/reference_data_providers.dart';
 import 'package:gram_aarogya_seva/core/models/appointment_model.dart';
 import 'package:gram_aarogya_seva/core/utils/date_utils.dart';
 import 'package:gram_aarogya_seva/core/providers/pagination_provider.dart';
+import 'package:gram_aarogya_seva/shared/widgets/date_leaf.dart';
+import 'package:gram_aarogya_seva/shared/widgets/empty_state.dart';
 import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
@@ -33,7 +35,7 @@ class DoctorAppointmentsScreen extends ConsumerWidget {
           // Status filter chips — all six statuses (SRS §7.7).
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
                 _FilterChip(
@@ -61,9 +63,9 @@ class DoctorAppointmentsScreen extends ConsumerWidget {
             child: appointmentsAsync.when(
               data: (appointments) {
                 if (appointments.isEmpty) {
-                  return Center(
-                    child:
-                        Text(tr('no_results'), style: AppTextStyles.titleLarge),
+                  return EmptyState(
+                    icon: Icons.event_note_outlined,
+                    message: tr('no_results'),
                   );
                 }
                 return ListView.builder(
@@ -78,7 +80,10 @@ class DoctorAppointmentsScreen extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(child: Text(tr('error_generic'))),
+              error: (_, __) => EmptyState(
+                icon: Icons.cloud_off_rounded,
+                message: tr('error_generic'),
+              ),
             ),
           ),
         ],
@@ -107,16 +112,21 @@ class _DoctorAppointmentCardState
     final centerName =
         ref.watch(healthCenterNameProvider(apt.healthCenterId));
 
+    final isOpen = apt.status == AppConstants.appointmentPending ||
+        apt.status == AppConstants.appointmentAccepted;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                DateLeaf(schemaDate: apt.date, muted: !isOpen),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,17 +138,19 @@ class _DoctorAppointmentCardState
                         style: AppTextStyles.titleLarge,
                       ),
                       Text(
-                        '${AppDateUtils.toDisplayDate(apt.date)} • '
-                        '${AppDateUtils.formatSlotForDisplay(apt.timeSlot)}',
-                        style: AppTextStyles.bodyMedium,
+                        AppDateUtils.formatSlotForDisplay(apt.timeSlot),
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
+                      const SizedBox(height: 6),
+                      StatusBadge(status: apt.status),
                     ],
                   ),
                 ),
-                StatusBadge(status: apt.status),
               ],
             ),
-            const SizedBox(height: 8),
+            const Divider(height: 24),
             Text(tr('reason_label', args: [apt.reason]),
                 style: AppTextStyles.bodyMedium),
             if (apt.createdByOperatorId != null)
@@ -152,10 +164,9 @@ class _DoctorAppointmentCardState
                 padding: const EdgeInsets.only(top: 4),
                 child: Row(
                   children: [
-                    Icon(Icons.local_hospital,
-                        size: 14,
-                        color: AppColors.primary.withValues(alpha: 0.7)),
-                    const SizedBox(width: 4),
+                    const Icon(Icons.local_hospital_outlined,
+                        size: 18, color: AppColors.primary),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: Text(centerName,
                           style: AppTextStyles.caption
@@ -178,16 +189,19 @@ class _DoctorAppointmentCardState
                 (apt.prepInstructions?.isNotEmpty ?? false))
               Container(
                 margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.infoContainer,
+                  borderRadius: BorderRadius.circular(12),
+                  border: const Border(
+                    left: BorderSide(color: AppColors.info, width: 3),
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline,
-                        size: 16, color: AppColors.info),
+                    const Icon(Icons.info_outline_rounded,
+                        size: 20, color: AppColors.info),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -221,9 +235,9 @@ class _DoctorAppointmentCardState
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.error,
                   side: const BorderSide(color: AppColors.error),
-                  minimumSize: const Size(0, 48),
+                  minimumSize: const Size(0, 52),
                 ),
-                icon: const Icon(Icons.close, size: 18),
+                icon: const Icon(Icons.close_rounded, size: 20),
                 label: Text(tr('reject')),
               ),
             ),
@@ -232,10 +246,10 @@ class _DoctorAppointmentCardState
               child: ElevatedButton.icon(
                 onPressed: () => _acceptAppointment(apt),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.success,
-                  minimumSize: const Size(0, 48),
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(0, 52),
                 ),
-                icon: const Icon(Icons.check, size: 18),
+                icon: const Icon(Icons.check_rounded, size: 20),
                 label: Text(tr('accept')),
               ),
             ),
@@ -263,9 +277,9 @@ class _DoctorAppointmentCardState
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.statusNoShow,
                   side: const BorderSide(color: AppColors.statusNoShow),
-                  minimumSize: const Size(0, 48),
+                  minimumSize: const Size(0, 52),
                 ),
-                icon: const Icon(Icons.person_off, size: 18),
+                icon: const Icon(Icons.person_off_outlined, size: 20),
                 label: Text(tr('no_show')),
               ),
             ),
@@ -275,9 +289,9 @@ class _DoctorAppointmentCardState
                 onPressed: () => _markCompleted(apt),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.statusCompleted,
-                  minimumSize: const Size(0, 48),
+                  minimumSize: const Size(0, 52),
                 ),
-                icon: const Icon(Icons.done_all, size: 18),
+                icon: const Icon(Icons.done_all_rounded, size: 20),
                 label: Text(tr('completed')),
               ),
             ),
@@ -467,15 +481,19 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChoiceChip(
+      showCheckmark: false,
       label: Text(
         label,
-        style: TextStyle(
-          fontSize: 16,
+        style: AppTextStyles.titleMedium.copyWith(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected ? AppColors.onPrimary : AppColors.onSurface,
         ),
       ),
       selected: isSelected,
       selectedColor: AppColors.primary,
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+      ),
       onSelected: (_) => onTap(),
     );
   }

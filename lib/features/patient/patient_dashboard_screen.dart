@@ -16,9 +16,13 @@ import 'package:gram_aarogya_seva/shared/widgets/load_more_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/status_badge.dart';
 import 'package:gram_aarogya_seva/shared/widgets/notification_bell.dart';
 import 'package:gram_aarogya_seva/shared/widgets/confirmation_dialog.dart';
-import 'package:gram_aarogya_seva/shared/widgets/guided_tour_dialog.dart';
 import 'package:gram_aarogya_seva/shared/widgets/feature_tour_overlay.dart';
 import 'package:gram_aarogya_seva/shared/widgets/emergency_helpline_sheet.dart';
+import 'package:gram_aarogya_seva/shared/widgets/date_leaf.dart';
+import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
+import 'package:gram_aarogya_seva/shared/widgets/language_segmented.dart';
+import 'package:gram_aarogya_seva/shared/widgets/section_header.dart';
+import 'package:gram_aarogya_seva/shared/widgets/zari_border.dart';
 import 'package:gram_aarogya_seva/features/patient/patient_providers.dart';
 
 /// Patient Home Screen — Rural Healthcare Interface.
@@ -140,122 +144,7 @@ class _PatientDashboardScreenState extends ConsumerState<PatientDashboardScreen>
     );
   }
 
-  void _showTourOptions() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLowest,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              context.locale.languageCode == 'mr'
-                  ? 'ॲप मार्गदर्शन कसे पाहायचे?'
-                  : context.locale.languageCode == 'hi'
-                      ? 'ऐप का मार्गदर्शन कैसे देखना चाहते हैं?'
-                      : 'How would you like the guided tour?',
-              style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            // Option 1: Spotlight Tour
-            ListTile(
-              onTap: () {
-                Navigator.pop(ctx);
-                _startSpotlightTour();
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFA5D6A7), width: 1.5),
-              ),
-              tileColor: const Color(0xFFE8F5E9),
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFF2E7D32),
-                child: Icon(Icons.fullscreen_rounded, color: Colors.white),
-              ),
-              title: Text(
-                context.locale.languageCode == 'mr'
-                    ? 'स्क्रीनवर फिचर हायलाइट करा (बोलणारा आवाज)'
-                    : context.locale.languageCode == 'hi'
-                        ? 'स्क्रीन पर फीचर देखें (बोलती आवाज़ के साथ)'
-                        : 'Interactive Spotlight Tour (With Voice Audio)',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              subtitle: Text(
-                context.locale.languageCode == 'mr'
-                    ? 'प्रत्येक बटण व फिचर चमकवून आवाजात माहिती देईल'
-                    : context.locale.languageCode == 'hi'
-                        ? 'हर बटन और फीचर को हाइलाइट करके आवाज़ में समझाएगा'
-                        : 'Highlights actual elements on your screen with audio',
-                style: const TextStyle(fontSize: 12),
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-            ),
-            const SizedBox(height: 12),
-            // Option 2: Step-by-Step Dialog
-            ListTile(
-              onTap: () {
-                Navigator.pop(ctx);
-                GuidedTourDialog.show(
-                  context,
-                  onStartSpotlightTour: _startSpotlightTour,
-                );
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFB3E5FC), width: 1.5),
-              ),
-              tileColor: const Color(0xFFE1F5FE),
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFF0288D1),
-                child: Icon(Icons.menu_book_rounded, color: Colors.white),
-              ),
-              title: Text(
-                context.locale.languageCode == 'mr'
-                    ? 'मार्गदर्शिका पुस्तिका (Step-by-Step Guide)'
-                    : context.locale.languageCode == 'hi'
-                        ? 'मार्गदर्शिका पुस्तिका (Step-by-Step Guide)'
-                        : 'Tour Book Dialog (Step-by-Step)',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              subtitle: Text(
-                context.locale.languageCode == 'mr'
-                    ? 'पायरी-दर-पायरी माहितीपत्रक'
-                    : context.locale.languageCode == 'hi'
-                        ? 'स्टेप-बाय-स्टेप जानकारी कार्ड'
-                        : 'Browse clear visual guide cards at your pace',
-                style: const TextStyle(fontSize: 12),
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -263,34 +152,23 @@ class _PatientDashboardScreenState extends ConsumerState<PatientDashboardScreen>
     final appointmentsAsync = ref.watch(myAppointmentsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAF7),
       appBar: AppBar(
-        title: Text(
-          tr('app_name'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        // The header below carries the zari edge; no second border here.
+        shape: const Border(),
+        title: Text(tr('app_name')),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline_rounded),
             tooltip: tr('guided_tour'),
-            onPressed: _showTourOptions,
+            onPressed: _startSpotlightTour,
           ),
           const NotificationBell(),
           const LogoutButton(),
+          const SizedBox(width: 4),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showTourOptions,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.onPrimary,
-        elevation: 4,
-        icon: const Icon(Icons.school_rounded, size: 22),
-        label: Text(
-          tr('guided_tour'),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-      ),
       body: RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: () async {
           ref.invalidate(patientProfileProvider);
           ref.invalidate(myAppointmentsProvider);
@@ -298,128 +176,107 @@ class _PatientDashboardScreenState extends ConsumerState<PatientDashboardScreen>
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+          padding: const EdgeInsets.only(bottom: 40),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Quick Language Bar (Wrapped in Key & Zero Overflow)
-              Container(
-                key: _langBarKey,
-                child: const _QuickLanguageBar(),
-              ),
-              const SizedBox(height: 14),
-
-              // 2. Profile Greeting or Warning Card
-              Container(
-                key: _profileCardKey,
-                child: profileAsync.when(
-                  data: (patient) => patient == null
-                      ? const _NoProfileCard()
-                      : _ProfileCard(
-                          name: patient.name,
-                          villageId: patient.villageId,
-                        ),
-                  loading: () => Container(
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (_, __) => const SizedBox.shrink(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 3. Guided Tour Banner
-              Container(
-                key: _tourBannerKey,
-                child: _GuidedTourCard(onTap: _showTourOptions),
-              ),
-              const SizedBox(height: 20),
-
-              // 4. Quick Services (2x2 Grid)
-              Text(
-                tr('quick_actions'),
-                style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              _ServicesGrid(
-                profileAsync: profileAsync,
-                bookKey: _bookAptKey,
-                recordsKey: _healthRecordsKey,
-                emergencyKey: _emergencyKey,
-                doctorKey: _doctorRegKey,
-              ),
-              const SizedBox(height: 24),
-
-              // 5. My Appointments Section
-              Container(
-                key: _appointmentsSectionKey,
+              // 1. Peacock header: who and where, then language
+              PaithaniHeader(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          tr('my_appointments'),
-                          style: AppTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold),
+                    Container(
+                      key: _profileCardKey,
+                      child: profileAsync.when(
+                        data: (patient) => patient == null
+                            ? const _NoProfileGreeting()
+                            : _ProfileGreeting(
+                                name: patient.name,
+                                villageId: patient.villageId,
+                              ),
+                        loading: () => const SizedBox(
+                          height: 72,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: CircularProgressIndicator(
+                              color: AppColors.zariBright,
+                            ),
+                          ),
                         ),
-                        appointmentsAsync.maybeWhen(
-                          data: (list) => list.isNotEmpty
-                              ? Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Text(
-                                    '${list.length}',
-                                    style: const TextStyle(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          orElse: () => const SizedBox.shrink(),
-                        ),
-                      ],
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    appointmentsAsync.when(
-                      data: (appointments) {
-                        if (appointments.isEmpty) {
-                          return _EmptyAppointmentsCard(
-                            onBookTap: () => _handleBookNavigation(context, profileAsync),
-                          );
-                        }
-                        return Column(
-                          children: [
-                            ...appointments.map(
-                              (apt) => PatientAppointmentCard(appointment: apt),
+                    const SizedBox(height: 18),
+                    Container(
+                      key: _langBarKey,
+                      child: const LanguageSegmented(),
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 2. Services — booking first and largest
+                    _ServicesGrid(
+                      profileAsync: profileAsync,
+                      bookKey: _bookAptKey,
+                      recordsKey: _healthRecordsKey,
+                      emergencyKey: _emergencyKey,
+                      doctorKey: _doctorRegKey,
+                    ),
+                    const SizedBox(height: 28),
+
+                    // 3. My Appointments
+                    Container(
+                      key: _appointmentsSectionKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SectionHeader(
+                            title: tr('my_appointments'),
+                            count: appointmentsAsync.valueOrNull?.length,
+                          ),
+                          appointmentsAsync.when(
+                            data: (appointments) {
+                              if (appointments.isEmpty) {
+                                return _EmptyAppointmentsCard(
+                                  onBookTap: () =>
+                                      _handleBookNavigation(context, profileAsync),
+                                );
+                              }
+                              return Column(
+                                children: [
+                                  ...appointments.map(
+                                    (apt) => PatientAppointmentCard(appointment: apt),
+                                  ),
+                                  LoadMoreButton(
+                                    pageKey: PageKeys.patientAppointments,
+                                    loadedCount: appointments.length,
+                                  ),
+                                ],
+                              );
+                            },
+                            loading: () => const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 32),
+                              child: Center(child: CircularProgressIndicator()),
                             ),
-                            LoadMoreButton(
-                              pageKey: PageKeys.patientAppointments,
-                              loadedCount: appointments.length,
-                            ),
-                          ],
-                        );
-                      },
-                      loading: () => const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 32),
-                        child: Center(child: CircularProgressIndicator()),
+                            error: (_, __) =>
+                                InlineError(message: tr('error_generic')),
+                          ),
+                        ],
                       ),
-                      error: (_, __) => Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(tr('error_generic'), style: AppTextStyles.bodyMedium),
-                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    // 4. Guided tour — quiet, at the end, for whoever needs it
+                    Container(
+                      key: _tourBannerKey,
+                      child: _GuidedTourCard(onTap: _startSpotlightTour),
                     ),
                   ],
                 ),
@@ -451,86 +308,8 @@ void _handleBookNavigation(
   context.push('/patient/book');
 }
 
-/// Prominent 1-tap language toggle bar with horizontal scrolling to prevent any pixel overflow.
-class _QuickLanguageBar extends StatelessWidget {
-  const _QuickLanguageBar();
-
-  @override
-  Widget build(BuildContext context) {
-    final currentCode = context.locale.languageCode;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.g_translate_rounded, color: AppColors.primary, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            'भाषा:',
-            style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              reverse: true,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildPill(context, 'mr', 'मराठी', currentCode == 'mr'),
-                  const SizedBox(width: 6),
-                  _buildPill(context, 'hi', 'हिंदी', currentCode == 'hi'),
-                  const SizedBox(width: 6),
-                  _buildPill(context, 'en', 'English', currentCode == 'en'),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPill(BuildContext context, String code, String label, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        context.setLocale(Locale(code));
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? AppColors.onPrimary : AppColors.onSurface,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Guided Tour Card with zero pixel overflow handling.
+/// Guided tour entry: a quiet outlined row, not a banner competing with
+/// booking.
 class _GuidedTourCard extends StatelessWidget {
   final VoidCallback onTap;
 
@@ -538,114 +317,42 @@ class _GuidedTourCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFA5D6A7)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return Material(
+      color: AppColors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.zari.withValues(alpha: 0.6)),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.lightbulb_rounded, color: Color(0xFF2E7D32), size: 28),
+          child: Row(
+            children: [
+              const Icon(Icons.play_circle_outline_rounded,
+                  color: AppColors.zariDeep, size: 36),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(tr('guided_tour_title'),
+                        style: AppTextStyles.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      tr('guided_tour_desc'),
+                      style: AppTextStyles.caption,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              tr('guided_tour_title'),
-                              style: AppTextStyles.titleLarge.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF1B5E20),
-                                fontSize: 16,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2E7D32),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'NEW',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        tr('guided_tour_desc'),
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: const Color(0xFF2E7D32),
-                          fontSize: 12,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 14,
-                    color: Color(0xFF1B5E20),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right_rounded,
+                  color: AppColors.outline),
+            ],
           ),
         ),
       ),
@@ -653,7 +360,9 @@ class _GuidedTourCard extends StatelessWidget {
   }
 }
 
-/// 2x2 Services Grid for high-contrast, effortless rural navigation with zero-overflow tiles.
+/// Services: booking is the reason the app exists, so it takes the full
+/// width in peacock; records and emergency share the next row; doctor
+/// registration — rarely used by patients — is a plain row below.
 class _ServicesGrid extends ConsumerWidget {
   const _ServicesGrid({
     required this.profileAsync,
@@ -672,74 +381,138 @@ class _ServicesGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            // 1. Book Appointment
-            Expanded(
-              child: _ActionTile(
-                key: bookKey,
-                title: tr('book_appointment'),
-                subtitle: tr('book_apt_subtitle'),
-                icon: Icons.calendar_month_rounded,
-                iconColor: const Color(0xFF1B5E20),
-                backgroundColor: const Color(0xFFE8F5E9),
-                borderColor: const Color(0xFFC8E6C9),
-                onTap: () => _handleBookNavigation(context, profileAsync),
-              ),
-            ),
-            const SizedBox(width: 12),
-            // 2. Health Records
-            Expanded(
-              child: _ActionTile(
-                key: recordsKey,
-                title: tr('health_records'),
-                subtitle: tr('records_subtitle'),
-                icon: Icons.description_rounded,
-                iconColor: const Color(0xFF0277BD),
-                backgroundColor: const Color(0xFFE1F5FE),
-                borderColor: const Color(0xFFB3E5FC),
-                onTap: () => context.push(AppConstants.routeHealthRecords),
-              ),
-            ),
-          ],
+        _BookTile(
+          key: bookKey,
+          onTap: () => _handleBookNavigation(context, profileAsync),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            // 3. Emergency & Helpline
-            Expanded(
-              child: _ActionTile(
-                key: emergencyKey,
-                title: tr('emergency_helpline'),
-                subtitle: tr('emergency_desc'),
-                icon: Icons.emergency_rounded,
-                iconColor: const Color(0xFFC62828),
-                backgroundColor: const Color(0xFFFFEBEE),
-                borderColor: const Color(0xFFFFCDD2),
-                onTap: () => EmergencyHelplineSheet.show(context),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _ActionTile(
+                  key: recordsKey,
+                  title: tr('health_records'),
+                  subtitle: tr('records_subtitle'),
+                  icon: Icons.description_outlined,
+                  accent: AppColors.primary,
+                  tint: AppColors.primaryFixed,
+                  onTap: () => context.push(AppConstants.routeHealthRecords),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _ActionTile(
+                  key: emergencyKey,
+                  title: tr('emergency_helpline'),
+                  subtitle: '108 / 104',
+                  icon: Icons.emergency_outlined,
+                  accent: AppColors.error,
+                  tint: AppColors.errorContainer,
+                  onTap: () => EmergencyHelplineSheet.show(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Material(
+          key: doctorKey,
+          color: AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
+              context.push('/doctor/register');
+            },
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 64),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.outlineVariant, width: 0.8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.medical_services_outlined,
+                      color: AppColors.primary, size: 26),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(tr('register_as_doctor'),
+                        style: AppTextStyles.titleMedium),
+                  ),
+                  const Icon(Icons.chevron_right_rounded,
+                      color: AppColors.outline),
+                ],
               ),
             ),
-            const SizedBox(width: 12),
-            // 4. Register as Doctor
-            Expanded(
-              child: _ActionTile(
-                key: doctorKey,
-                title: tr('register_as_doctor'),
-                subtitle: tr('doctor_registration_mode'),
-                icon: Icons.medical_services_rounded,
-                iconColor: const Color(0xFF4527A0),
-                backgroundColor: const Color(0xFFEDE7F6),
-                borderColor: const Color(0xFFD1C4E9),
-                onTap: () {
-                  ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
-                  context.push('/doctor/register');
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _BookTile extends StatelessWidget {
+  const _BookTile({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(24),
+      clipBehavior: Clip.antiAlias,
+      child: Ink(
+        decoration: const BoxDecoration(gradient: AppColors.healingGradient),
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 16, 20),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.zariBright, width: 1.5),
+                  ),
+                  child: const Icon(Icons.calendar_month_rounded,
+                      color: AppColors.onPrimary, size: 30),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tr('book_appointment'),
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: AppColors.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        tr('book_apt_subtitle'),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.onPrimaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_rounded,
+                    color: AppColors.zariBright, size: 28),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -750,100 +523,60 @@ class _ActionTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.iconColor,
-    required this.backgroundColor,
-    required this.borderColor,
+    required this.accent,
+    required this.tint,
     required this.onTap,
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
-  final Color iconColor;
-  final Color backgroundColor;
-  final Color borderColor;
+  final Color accent;
+  final Color tint;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 130),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Material(
+      color: AppColors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 140),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.outlineVariant, width: 0.8),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: iconColor.withValues(alpha: 0.15),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(icon, color: iconColor, size: 22),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 13,
-                      color: iconColor.withValues(alpha: 0.6),
-                    ),
-                  ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: tint,
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.onSurface,
-                        fontSize: 14,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 11,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                child: Icon(icon, color: accent, size: 26),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                title,
+                style: AppTextStyles.titleMedium,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: AppTextStyles.caption,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ),
@@ -851,76 +584,48 @@ class _ActionTile extends StatelessWidget {
   }
 }
 
-class _NoProfileCard extends StatelessWidget {
-  const _NoProfileCard();
+/// Header greeting when the patient has not created a profile yet: the only
+/// thing they can usefully do is create one, so that is the whole message.
+class _NoProfileGreeting extends StatelessWidget {
+  const _NoProfileGreeting();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFFFB74D)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFE0B2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person_add_rounded, color: Color(0xFFE65100), size: 24),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          tr('complete_profile_first'),
+          style: AppTextStyles.headlineMedium.copyWith(
+            color: AppColors.onPrimary,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  tr('complete_profile_first'),
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFFE65100),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  tr('tap_create_profile'),
-                  style: AppTextStyles.caption.copyWith(color: const Color(0xFFBF360C)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          tr('tap_create_profile'),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.onPrimaryContainer,
           ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () => context.push(AppConstants.routePatientProfile),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE65100),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              minimumSize: const Size(0, 36),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: Text(
-              tr('create_profile'),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
+        ),
+        const SizedBox(height: 14),
+        ElevatedButton.icon(
+          onPressed: () => context.push(AppConstants.routePatientProfile),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.zariBright,
+            foregroundColor: AppColors.primaryDeep,
+            minimumSize: const Size(0, 52),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
-        ],
-      ),
+          icon: const Icon(Icons.person_add_alt_1_rounded),
+          label: Text(tr('create_profile')),
+        ),
+      ],
     );
   }
 }
 
-class _ProfileCard extends ConsumerWidget {
-  const _ProfileCard({required this.name, required this.villageId});
+class _ProfileGreeting extends ConsumerWidget {
+  const _ProfileGreeting({required this.name, required this.villageId});
 
   final String name;
   final String villageId;
@@ -929,78 +634,54 @@ class _ProfileCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final villageName = ref.watch(villageNameProvider(villageId));
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person_rounded, color: AppColors.primary, size: 26),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  tr('patient_greeting', args: [name]),
-                  style: AppTextStyles.titleLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tr('patient_greeting', args: [name]),
+                style: AppTextStyles.displayMedium.copyWith(
+                  color: AppColors.onPrimary,
                 ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_rounded, size: 15, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        '${tr("village_label_short")}: ${villageName ?? tr("loading")}',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  const Icon(Icons.location_on_outlined,
+                      size: 20, color: AppColors.zariBright),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      '${tr("village_label_short")}: ${villageName ?? tr("loading")}',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.onPrimaryContainer,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
-            tooltip: tr('edit_profile'),
-            onPressed: () => context.push(AppConstants.routePatientProfile),
-          ),
-        ],
-      ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit_outlined, color: AppColors.onPrimary),
+          tooltip: tr('edit_profile'),
+          onPressed: () => context.push(AppConstants.routePatientProfile),
+        ),
+      ],
     );
   }
 }
 
-/// Friendly empty state for patient appointments with a high-contrast CTA.
+/// Empty state for patient appointments: says what to do, with the button
+/// that does it.
 class _EmptyAppointmentsCard extends StatelessWidget {
   const _EmptyAppointmentsCard({required this.onBookTap});
 
@@ -1013,58 +694,37 @@ class _EmptyAppointmentsCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.outlineVariant, width: 0.8),
       ),
       child: Column(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.event_available_rounded,
-              size: 36,
-              color: AppColors.primary,
-            ),
+          const Icon(
+            Icons.event_available_outlined,
+            size: 44,
+            color: AppColors.primary,
           ),
           const SizedBox(height: 12),
           Text(
             tr('no_appointments'),
-            style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.bold),
+            style: AppTextStyles.titleLarge,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             tr('book_apt_subtitle'),
-            style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
+            style: AppTextStyles.caption,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 48,
-            child: ElevatedButton.icon(
-              onPressed: onBookTap,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-              ),
-              icon: const Icon(Icons.add_circle_outline, size: 20),
-              label: Text(
-                tr('book_appointment'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+          OutlinedButton.icon(
+            onPressed: onBookTap,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, 52),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
             ),
+            icon: const Icon(Icons.add_rounded),
+            label: Text(tr('book_appointment')),
           ),
         ],
       ),
@@ -1072,7 +732,8 @@ class _EmptyAppointmentsCard extends StatelessWidget {
   }
 }
 
-/// Individual Appointment Card with zero pixel overflow handling.
+/// One appointment: calendar leaf on the left, time / doctor / centre on the
+/// right, status top-right, the cancel action at the bottom when allowed.
 class PatientAppointmentCard extends ConsumerStatefulWidget {
   const PatientAppointmentCard({super.key, required this.appointment});
 
@@ -1113,86 +774,71 @@ class _PatientAppointmentCardState
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.outlineVariant, width: 0.8),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date & Slot row (wrapped in Expanded so it never overflows next to StatusBadge)
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                DateLeaf(schemaDate: apt.date, muted: !isOpen || hasPassed),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.access_time_rounded, size: 18, color: AppColors.primary),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          '${AppDateUtils.toDisplayDate(apt.date)} • ${AppDateUtils.formatSlotForDisplay(apt.timeSlot)}',
-                          style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              AppDateUtils.formatSlotForDisplay(apt.timeSlot),
+                              style: AppTextStyles.titleLarge,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          StatusBadge(status: apt.status),
+                        ],
+                      ),
+                      if (apt.doctorName.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          tr('doctor_name', args: [apt.doctorName]),
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      ],
+                      if (centerName != null)
+                        Text(
+                          centerName,
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                StatusBadge(status: apt.status),
               ],
             ),
-            const Divider(height: 18),
-            if (apt.doctorName.isNotEmpty)
-              Row(
-                children: [
-                  const Icon(Icons.medical_services_outlined, size: 16, color: AppColors.secondary),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      tr('doctor_name', args: [apt.doctorName]),
-                      style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            if (centerName != null) ...[
-              const SizedBox(height: 5),
-              Row(
-                children: [
-                  const Icon(Icons.local_hospital_outlined, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      centerName,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.primary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             Text(
               tr('reason_label', args: [apt.reason]),
-              style: AppTextStyles.caption.copyWith(color: AppColors.onSurfaceVariant),
+              style: AppTextStyles.caption,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
 
             if (apt.prepInstructions?.isNotEmpty ?? false)
               _InfoBox(
-                icon: Icons.info_outline,
+                icon: Icons.info_outline_rounded,
                 color: AppColors.info,
                 text: apt.prepInstructions!,
               ),
@@ -1205,23 +851,24 @@ class _PatientAppointmentCardState
               ),
 
             if (isOpen && !hasPassed) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               if (_isCancelling)
                 const Center(child: CircularProgressIndicator())
               else if (canCancel)
-                SizedBox(
-                  height: 44,
-                  child: OutlinedButton.icon(
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
                     onPressed: _cancelAppointment,
-                    style: OutlinedButton.styleFrom(
+                    style: TextButton.styleFrom(
                       foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      minimumSize: const Size(0, 48),
                     ),
-                    icon: const Icon(Icons.cancel_outlined, size: 16),
+                    icon: const Icon(Icons.close_rounded, size: 20),
                     label: Text(
                       tr('cancel_appointment'),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.error,
+                      ),
                     ),
                   ),
                 )
@@ -1288,21 +935,28 @@ class _InfoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: 10),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
+          color: color.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(12),
+          border: Border(left: BorderSide(color: color, width: 3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 18, color: color),
+            Icon(icon, size: 20, color: color),
             const SizedBox(width: 8),
-            Expanded(child: Text(text, style: AppTextStyles.caption)),
+            Expanded(
+              child: Text(
+                text,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.onSurface,
+                ),
+              ),
+            ),
           ],
         ),
       ),

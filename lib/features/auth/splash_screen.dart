@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gram_aarogya_seva/core/theme/app_colors.dart';
 import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
+import 'package:gram_aarogya_seva/shared/widgets/zari_border.dart';
 
 /// Splash screen shown while Firebase + auth state loads.
 class SplashScreen extends ConsumerWidget {
@@ -10,48 +11,46 @@ class SplashScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(gradient: AppColors.healingGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(flex: 3),
+              const AppMark(size: 112),
+              const SizedBox(height: 28),
+              Text(
+                'ग्राम आरोग्य सेवा',
+                style: AppTextStyles.displayMedium.copyWith(
+                  color: AppColors.onPrimary,
+                ),
+                textAlign: TextAlign.center,
               ),
-              child: const Icon(
-                Icons.local_hospital_rounded,
-                size: 72,
-                color: Colors.white,
+              const SizedBox(height: 6),
+              Text(
+                'Gram Aarogya Seva',
+                style: AppTextStyles.titleLarge.copyWith(
+                  color: AppColors.onPrimaryContainer,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'ग्राम आरोग्य सेवा',
-              style: AppTextStyles.headlineLarge.copyWith(
-                color: Colors.white,
+              const SizedBox(height: 28),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 72),
+                child: ZariBorder(),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Gram Aarogya Seva',
-              style: AppTextStyles.titleLarge.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
+              const Spacer(flex: 2),
+              const SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(
+                  color: AppColors.zariBright,
+                  strokeWidth: 2.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            const SizedBox(
-              width: 40,
-              height: 40,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 3,
-              ),
-            ),
-          ],
+              const SizedBox(height: 48),
+            ],
+          ),
         ),
       ),
     );

@@ -8,6 +8,9 @@ import 'package:gram_aarogya_seva/core/theme/app_text_styles.dart';
 import 'package:gram_aarogya_seva/core/utils/validators.dart';
 import 'package:gram_aarogya_seva/shared/widgets/large_button.dart';
 import 'package:gram_aarogya_seva/shared/widgets/guided_tour_dialog.dart';
+import 'package:gram_aarogya_seva/shared/widgets/inline_error.dart';
+import 'package:gram_aarogya_seva/shared/widgets/language_segmented.dart';
+import 'package:gram_aarogya_seva/shared/widgets/zari_border.dart';
 import 'package:gram_aarogya_seva/core/models/user_model.dart';
 import 'package:gram_aarogya_seva/core/providers/auth_providers.dart';
 import 'package:gram_aarogya_seva/features/auth/auth_notifier.dart';
@@ -52,148 +55,121 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
     });
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 48),
-
-              // App icon
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.local_hospital_rounded,
-                  size: 56,
-                  color: AppColors.primary,
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Peacock hero with the app mark and name
+            PaithaniHeader(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                MediaQuery.paddingOf(context).top + 36,
+                24,
+                32,
               ),
-              const SizedBox(height: 24),
-
-              // App title
-              Text(
-                tr('app_name'),
-                style: AppTextStyles.headlineLarge.copyWith(
-                  color: AppColors.primary,
-                ),
-                textAlign: TextAlign.center,
+              child: Column(
+                children: [
+                  const AppMark(size: 92),
+                  const SizedBox(height: 20),
+                  Text(
+                    tr('app_name'),
+                    style: AppTextStyles.displayMedium.copyWith(
+                      color: AppColors.onPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  // Language first: a villager may not read English.
+                  const LanguageSegmented(),
+                ],
               ),
-              const SizedBox(height: 48),
+            ),
 
-              // Language selector
-              _LanguageSelector(),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () => GuidedTourDialog.show(context),
-                icon: const Icon(Icons.lightbulb_outline_rounded, size: 20),
-                label: Text(
-                  tr('guided_tour_title'),
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Phone number form
-              Form(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+              child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(tr('enter_mobile'), style: AppTextStyles.titleLarge),
-                    const SizedBox(height: 12),
+                    Text(tr('enter_mobile'), style: AppTextStyles.headlineMedium),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       maxLength: 10,
-                      style: AppTextStyles.bodyLarge,
+                      autofillHints: const [AutofillHints.telephoneNumberNational],
+                      style: AppTextStyles.headlineSmall.copyWith(
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w500,
+                      ),
                       decoration: InputDecoration(
-                        prefixText: '+91  ',
-                        prefixStyle: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 18, right: 10),
+                          child: Text(
+                            '+91',
+                            style: AppTextStyles.headlineSmall.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
                         ),
-                        hintText: '9876543210',
+                        prefixIconConstraints:
+                            const BoxConstraints(minWidth: 0, minHeight: 0),
+                        hintText: '98765 43210',
+                        hintStyle: AppTextStyles.headlineSmall.copyWith(
+                          color: AppColors.outlineVariant,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 1.5,
+                        ),
                         counterText: '',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       validator: Validators.validatePhone,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
                     LargeButton(
                       label: tr('continue_btn'),
-                      icon: Icons.send_rounded,
+                      icon: Icons.arrow_forward_rounded,
                       isLoading: authState.status == AuthStatus.sendingOtp,
                       onPressed: authState.status == AuthStatus.sendingOtp
                           ? null
                           : _onSendOtp,
                     ),
-                    const SizedBox(height: 16),
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () {
-                          ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(tr('doctor_registration_mode')),
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.medical_services_outlined, size: 20),
-                        label: Text(
-                          tr('register_as_doctor'),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+
+                    // Error message
+                    if (authState.status == AuthStatus.error &&
+                        authState.errorKey != null) ...[
+                      const SizedBox(height: 16),
+                      InlineError(message: tr(authState.errorKey!)),
+                    ],
+
+                    const SizedBox(height: 28),
+                    const Divider(height: 1),
+                    const SizedBox(height: 8),
+
+                    // Secondary paths, as plain rows rather than competing buttons
+                    _SecondaryAction(
+                      icon: Icons.play_circle_outline_rounded,
+                      label: tr('guided_tour_title'),
+                      onTap: () => GuidedTourDialog.show(context),
+                    ),
+                    _SecondaryAction(
+                      icon: Icons.medical_services_outlined,
+                      label: tr('register_as_doctor'),
+                      onTap: () {
+                        ref.read(isDoctorRegistrationIntentProvider.notifier).state = true;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(tr('doctor_registration_mode')),
+                            duration: const Duration(seconds: 4),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),
               ),
-
-              // Error message
-              if (authState.status == AuthStatus.error &&
-                  authState.errorKey != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline, color: AppColors.error),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          tr(authState.errorKey!),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -217,47 +193,29 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
   }
 }
 
-/// Language selection row — switchable from login screen.
-/// SRS DP-1: 3 languages from any screen.
-class _LanguageSelector extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _LangChip(locale: const Locale('en'), label: 'English'),
-        const SizedBox(width: 8),
-        _LangChip(locale: const Locale('mr'), label: 'मराठी'),
-        const SizedBox(width: 8),
-        _LangChip(locale: const Locale('hi'), label: 'हिंदी'),
-      ],
-    );
-  }
-}
+class _SecondaryAction extends StatelessWidget {
+  const _SecondaryAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
-class _LangChip extends StatelessWidget {
-  final Locale locale;
+  final IconData icon;
   final String label;
-
-  const _LangChip({required this.locale, required this.label});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = context.locale == locale;
-    return ChoiceChip(
-      label: Text(
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+      leading: Icon(icon, color: AppColors.primary, size: 28),
+      title: Text(
         label,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isSelected ? AppColors.onPrimary : AppColors.primary,
-        ),
+        style: AppTextStyles.titleMedium.copyWith(color: AppColors.primary),
       ),
-      selected: isSelected,
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.primary),
-      onSelected: (_) => context.setLocale(locale),
+      trailing: const Icon(Icons.chevron_right_rounded,
+          color: AppColors.outline),
+      onTap: onTap,
     );
   }
 }

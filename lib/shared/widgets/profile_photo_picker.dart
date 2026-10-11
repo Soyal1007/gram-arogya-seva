@@ -207,7 +207,7 @@ class _ProfilePhotoPickerState extends State<ProfilePhotoPicker> {
           const SizedBox(height: 8),
           Text(
             _photoBase64 != null ? tr('tap_to_change') : tr('add_photo_optional'),
-            style: AppTextStyles.caption.copyWith(fontSize: 13),
+            style: AppTextStyles.caption.copyWith(fontSize: 15),
           ),
         ],
       ),
