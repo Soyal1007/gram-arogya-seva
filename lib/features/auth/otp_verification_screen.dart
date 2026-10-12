@@ -80,8 +80,11 @@ class _OtpVerificationScreenState
     // When auth succeeds, create/update user doc, then GoRouter handles redirect
     ref.listen<AuthState>(authNotifierProvider, (prev, next) async {
       if (next.status == AuthStatus.success && prev?.status != AuthStatus.success) {
+        // GoRouter can redirect away (disposing this screen) while the await
+        // is pending, so capture the container first — `ref` dies with us.
+        final container = ProviderScope.containerOf(context, listen: false);
         await _createUserDocIfNeeded();
-        ref.invalidate(currentUserProvider);
+        container.invalidate(currentUserProvider);
       }
     });
 

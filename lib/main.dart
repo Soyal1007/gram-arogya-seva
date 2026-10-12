@@ -32,8 +32,13 @@ void main() async {
   // A pilot runs on phones nobody can inspect, used by people who will not
   // file bug reports — they will simply stop opening the app. Without
   // Crashlytics, a crash specific to one device model is invisible forever.
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+
+  // Framework errors (layout overflow, build exceptions) are reported
+  // non-fatal: the app keeps running, and counting them as crashes hides
+  // real crashes in the crash-free metrics.
   FlutterError.onError = (details) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    FirebaseCrashlytics.instance.recordFlutterError(details);
   };
   WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
